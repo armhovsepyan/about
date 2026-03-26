@@ -861,6 +861,21 @@ function switchGame(name) {
   /* ── State ── */
   let grid, solution, given, selected, diff, timerSec, timerInterval, hintsLeft;
 
+  function showEmpty() {
+    grid     = new Array(81).fill(0);
+    solution = new Array(81).fill(0);
+    given    = new Array(81).fill(false);
+    selected = -1;
+    clearInterval(timerInterval);
+    timerSec = 0;
+    updateTimer();
+    render();
+    setStatus('Click "New Game" to start');
+    document.getElementById('sudoku-status').classList.add('idle');
+    document.getElementById('sudoku-check-btn').disabled = true;
+    document.getElementById('sudoku-hint-btn').disabled = true;
+  }
+
   function init(d) {
     diff = d || diff || 'easy';
     const { puzzle, solution: sol } = generatePuzzle(DIFF_CLUES[diff]);
@@ -874,6 +889,9 @@ function switchGame(name) {
     updateTimer();
     timerInterval = setInterval(() => { timerSec++; updateTimer(); }, 1000);
     render();
+    document.getElementById('sudoku-status').classList.remove('idle');
+    document.getElementById('sudoku-check-btn').disabled = false;
+    document.getElementById('sudoku-hint-btn').disabled = false;
     setStatus('Select a cell to begin');
   }
 
@@ -977,5 +995,6 @@ function switchGame(name) {
   });
 
   /* ── Boot ── */
-  init('easy');
+  diff = 'easy';
+  showEmpty();
 })();

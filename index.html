@@ -48,7 +48,6 @@
       <span class="tag">MongoDB</span>
       <span class="tag">Dedicated Server</span>
       <span class="tag">Linux</span>
-      <span class="tag">Docker</span>
       <span class="tag">Git</span>
       <span class="tag">JavaScript</span>
       <span class="tag">AI Dev</span>
@@ -374,6 +373,14 @@
         <h3>Sudoku</h3>
         <p>Fill every row, column and 3×3 box with digits 1–9. Click a cell, then press a key or use the numpad below.</p>
 
+        <div class="sudoku-status" id="sudoku-status">Select a cell to begin</div>
+
+        <div class="sudoku-action-row">
+          <button onclick="sudokuNew()">🔄 New Game</button>
+          <button id="sudoku-check-btn" onclick="sudokuValidate()">✔ Check</button>
+          <button id="sudoku-hint-btn" onclick="sudokuHint()">💡 Hint</button>
+        </div>
+
         <div class="sudoku-difficulty">
           <button class="active" onclick="sudokuSetDiff('easy')">Easy</button>
           <button onclick="sudokuSetDiff('medium')">Medium</button>
@@ -394,14 +401,6 @@
           <button onclick="sudokuInput(9)">9</button>
           <button onclick="sudokuInput(0)">✕</button>
         </div>
-
-        <div class="sudoku-action-row">
-          <button onclick="sudokuHint()">💡 Hint</button>
-          <button onclick="sudokuValidate()">✔ Check</button>
-          <button onclick="sudokuNew()">🔄 New Game</button>
-        </div>
-
-        <div class="sudoku-status" id="sudoku-status">Select a cell to begin</div>
 
         <div class="sudoku-tips">
           <div class="sudoku-tips-title">⌨ Shortcuts</div>
@@ -431,7 +430,7 @@
     <div class="info-card reveal">
       <div class="info-card-label">Education</div>
       <h3>Master of Engineering</h3>
-      <div class="subtitle">State Engineering University of Armenia · 2017</div>
+      <div class="subtitle">State Engineering University of Armenia · 2000</div>
       <div class="detail">
         Textile and Light Industry Products.<br>
         Advanced engineering studies covering algorithms, software architecture, and systems design.
