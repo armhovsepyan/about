@@ -1,0 +1,2453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Armen Hovsepyan — Gameplay Systems Engineer</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0c10;
+      --surface: #111318;
+      --surface2: #161920;
+      --border: #1f2435;
+      --accent: #4f8ef7;
+      --accent2: #8b5cf6;
+      --accent3: #06d6a0;
+      --text: #e2e8f0;
+      --muted: #6b7a99;
+      --tag-bg: #161b2e;
+      --tag-border: #252d46;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* ── PARTICLES CANVAS ── */
+    #particles-canvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      opacity: .45;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 200;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 6%;
+      height: 62px;
+      background: rgba(10,12,16,.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-weight: 800;
+      font-size: 1rem;
+      letter-spacing: .02em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-links { display: flex; gap: 2rem; list-style: none; align-items: center; }
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .875rem;
+      transition: color .2s;
+      position: relative;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -3px; left: 0; right: 0;
+      height: 1px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transition: transform .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover::after { transform: scaleX(1); }
+
+    .nav-game-btn {
+      background: linear-gradient(135deg, var(--accent3), var(--accent));
+      color: #000 !important;
+      padding: .3rem .9rem;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: .8rem !important;
+    }
+    .nav-game-btn::after { display: none !important; }
+    .nav-game-btn:hover { opacity: .85; }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 80px 6% 60px;
+      position: relative;
+    }
+
+    .hero-bg-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(79,142,247,.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(79,142,247,.035) 1px, transparent 1px);
+      background-size: 50px 50px;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+    }
+
+    .hero-content { position: relative; z-index: 1; max-width: 880px; }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: rgba(6,214,160,.1);
+      border: 1px solid rgba(6,214,160,.25);
+      border-radius: 999px;
+      padding: .3rem 1rem;
+      font-size: .78rem;
+      color: var(--accent3);
+      font-weight: 600;
+      margin-bottom: 1.6rem;
+      letter-spacing: .04em;
+    }
+
+    .hero-badge-dot {
+      width: 6px; height: 6px;
+      background: var(--accent3);
+      border-radius: 50%;
+      animation: blink 1.8s infinite;
+    }
+
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+    h1 {
+      font-size: clamp(2.6rem, 7vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.05;
+      margin-bottom: .5rem;
+      letter-spacing: -.02em;
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-role {
+      font-size: clamp(.95rem, 2vw, 1.2rem);
+      color: var(--muted);
+      margin-bottom: .8rem;
+      font-weight: 400;
+    }
+
+    .typewriter-wrap {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      color: var(--accent3);
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      margin-bottom: 1.8rem;
+      min-height: 1.8em;
+    }
+
+    #typewriter::after {
+      content: '|';
+      animation: blink .7s infinite;
+    }
+
+    .hero-summary {
+      font-size: 1rem;
+      color: #8fa3be;
+      max-width: 680px;
+      margin-bottom: 2rem;
+      line-height: 1.75;
+    }
+
+    .hero-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: 2.4rem;
+    }
+
+    .tag {
+      background: var(--tag-bg);
+      border: 1px solid var(--tag-border);
+      border-radius: 6px;
+      padding: .22rem .65rem;
+      font-size: .78rem;
+      color: var(--muted);
+      transition: all .2s;
+      cursor: default;
+    }
+    .tag:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+    .hero-cta { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      padding: .72rem 1.7rem;
+      border-radius: 8px;
+      font-size: .95rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all .2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      box-shadow: 0 0 24px rgba(79,142,247,.3);
+    }
+    .btn-primary:hover { opacity: .88; transform: translateY(-2px); box-shadow: 0 0 36px rgba(79,142,247,.4); }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-2px); }
+
+    .btn-game {
+      background: linear-gradient(135deg, var(--accent3), #00b377);
+      color: #000;
+      box-shadow: 0 0 20px rgba(6,214,160,.25);
+    }
+    .btn-game:hover { opacity: .88; transform: translateY(-2px); }
+
+    /* ── STATS ── */
+    #stats {
+      position: relative;
+      z-index: 1;
+      padding: 50px 6%;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 1.4rem 1rem;
+      border-radius: 12px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      transition: border-color .2s, transform .2s;
+    }
+    .stat-item:hover { border-color: rgba(79,142,247,.4); transform: translateY(-3px); }
+
+    .stat-number {
+      font-size: 2.8rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: .4rem;
+    }
+
+    .stat-label { font-size: .8rem; color: var(--muted); }
+
+    /* ── SECTIONS ── */
+    section { position: relative; z-index: 1; padding: 90px 6%; }
+
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .14em;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: .8rem;
+    }
+
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+      max-width: 100px;
+    }
+
+    h2 {
+      font-size: clamp(1.7rem, 4vw, 2.4rem);
+      font-weight: 800;
+      margin-bottom: 3rem;
+      letter-spacing: -.02em;
+    }
+
+    /* ── EXPERIENCE ── */
+    #experience { background: var(--surface); }
+
+    .exp-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem;
+      margin-bottom: 1.2rem;
+      transition: border-color .25s, box-shadow .25s, transform .25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .exp-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 3px; height: 100%;
+      background: linear-gradient(180deg, var(--accent), var(--accent2));
+    }
+
+    .exp-card:hover {
+      border-color: rgba(79,142,247,.35);
+      box-shadow: 0 8px 40px rgba(79,142,247,.08);
+      transform: translateX(4px);
+    }
+
+    .exp-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: .5rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .exp-role { font-size: 1.1rem; font-weight: 700; }
+    .exp-company { font-size: .88rem; color: var(--accent); margin-top: .2rem; font-weight: 500; }
+
+    .exp-period {
+      font-size: .78rem;
+      color: var(--muted);
+      background: var(--tag-bg);
+      border: 1px solid var(--tag-border);
+      border-radius: 999px;
+      padding: .22rem .85rem;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .exp-bullets { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+
+    .exp-bullets li {
+      display: flex;
+      gap: .75rem;
+      font-size: .9rem;
+      color: #8fa3be;
+      line-height: 1.6;
+    }
+
+    .exp-bullets li::before {
+      content: '›';
+      color: var(--accent);
+      font-weight: 900;
+      flex-shrink: 0;
+      font-size: 1.1rem;
+      line-height: 1.4;
+    }
+
+    /* ── SKILLS ── */
+    #skills { background: var(--bg); }
+
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 1.1rem;
+    }
+
+    .skill-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      transition: all .25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .skill-card::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(79,142,247,.06), transparent 60%);
+      opacity: 0;
+      transition: opacity .3s;
+      pointer-events: none;
+    }
+
+    .skill-card:hover { border-color: rgba(79,142,247,.35); transform: translateY(-3px); }
+    .skill-card:hover::after { opacity: 1; }
+
+    .skill-card-header {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      margin-bottom: 1rem;
+    }
+
+    .skill-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .skill-category { font-weight: 700; font-size: .93rem; }
+
+    .skill-tags { display: flex; flex-wrap: wrap; gap: .4rem; }
+
+    .skill-tag {
+      background: var(--tag-bg);
+      border: 1px solid var(--tag-border);
+      border-radius: 5px;
+      padding: .18rem .55rem;
+      font-size: .76rem;
+      color: var(--muted);
+      transition: all .2s;
+    }
+    .skill-tag:hover { border-color: var(--accent2); color: var(--accent2); }
+
+    /* ── MINI GAME SECTION ── */
+    #game-section {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .game-wrapper {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 3rem;
+      align-items: start;
+    }
+
+    @media (max-width: 800px) {
+      .game-wrapper { grid-template-columns: 1fr; }
+    }
+
+    .game-info h3 {
+      font-size: 1.6rem;
+      font-weight: 800;
+      margin-bottom: .8rem;
+    }
+
+    .game-info p {
+      color: var(--muted);
+      font-size: .9rem;
+      line-height: 1.7;
+      margin-bottom: 1.4rem;
+    }
+
+    .game-controls-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      margin-bottom: 1.6rem;
+    }
+
+    .game-controls-list li {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      font-size: .85rem;
+      color: var(--muted);
+    }
+
+    .key {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-bottom: 3px solid var(--border);
+      border-radius: 5px;
+      padding: .15rem .55rem;
+      font-size: .78rem;
+      font-family: monospace;
+      color: var(--text);
+      min-width: 28px;
+    }
+
+    .game-score-display {
+      display: flex;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .score-box {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .8rem 1.2rem;
+      text-align: center;
+    }
+
+    .score-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, var(--accent3), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.1;
+    }
+
+    .score-label {
+      font-size: .72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    /* Snake game canvas container */
+    .game-container {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    #snake-canvas {
+      display: block;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #050709;
+      box-shadow: 0 0 40px rgba(6,214,160,.12), inset 0 0 60px rgba(0,0,0,.5);
+      image-rendering: pixelated;
+    }
+
+    .game-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: rgba(5,7,9,.85);
+      backdrop-filter: blur(4px);
+      border-radius: 12px;
+      gap: .8rem;
+      transition: opacity .3s;
+    }
+
+    .game-overlay.hidden { opacity: 0; pointer-events: none; }
+
+    .game-overlay-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--accent3);
+      text-shadow: 0 0 20px rgba(6,214,160,.5);
+    }
+
+    .game-overlay-sub {
+      font-size: .85rem;
+      color: var(--muted);
+    }
+
+    .game-overlay-score {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--text);
+    }
+
+    /* ── ABOUT ── */
+    #about { background: var(--surface2); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 680px) { .about-grid { grid-template-columns: 1fr; } }
+
+    .info-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 2rem;
+      transition: border-color .2s;
+    }
+    .info-card:hover { border-color: rgba(139,92,246,.35); }
+
+    .info-card-label {
+      font-size: .72rem;
+      text-transform: uppercase;
+      letter-spacing: .12em;
+      color: var(--accent2);
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+    }
+
+    .info-card h3 { font-size: 1.05rem; margin-bottom: .3rem; }
+    .info-card .subtitle { font-size: .85rem; color: var(--accent); margin-bottom: .5rem; font-weight: 500; }
+    .info-card .detail { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+
+    .lang-list { display: flex; flex-direction: column; gap: 1.2rem; }
+
+    .lang-item { display: flex; flex-direction: column; gap: .4rem; }
+
+    .lang-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .lang-name { font-size: .9rem; font-weight: 600; }
+    .lang-level { font-size: .75rem; color: var(--muted); }
+
+    .lang-bar-wrap {
+      height: 5px;
+      background: var(--border);
+      border-radius: 99px;
+      overflow: hidden;
+    }
+
+    .lang-bar {
+      height: 100%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: transform 1s cubic-bezier(.4,0,.2,1);
+    }
+
+    .lang-bar.animate { transform: scaleX(1); }
+
+    /* ── FOOTER ── */
+    footer {
+      position: relative; z-index: 1;
+      text-align: center;
+      padding: 2.5rem 6%;
+      border-top: 1px solid var(--border);
+      font-size: .82rem;
+      color: var(--muted);
+    }
+
+    footer span { color: var(--accent3); }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── CURSOR GLOW ── */
+    .cursor-glow {
+      position: fixed;
+      width: 300px; height: 300px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      background: radial-gradient(circle, rgba(79,142,247,.06) 0%, transparent 70%);
+      transform: translate(-50%, -50%);
+      transition: left .12s ease, top .12s ease;
+    }
+
+    /* ── CONTACT SECTION ── */
+    #contact { background: var(--bg); }
+
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+      margin-bottom: 3rem;
+    }
+
+    @media (max-width: 680px) { .contact-grid { grid-template-columns: 1fr; } }
+
+    .contact-card {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.6rem;
+      text-decoration: none;
+      color: var(--text);
+      transition: all .25s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(79,142,247,.06), rgba(139,92,246,.06));
+      opacity: 0;
+      transition: opacity .25s;
+    }
+
+    .contact-card:hover {
+      border-color: rgba(79,142,247,.4);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 30px rgba(79,142,247,.1);
+    }
+
+    .contact-card:hover::before { opacity: 1; }
+
+    .contact-icon {
+      width: 50px; height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .contact-info { position: relative; }
+    .contact-label { font-size: .72rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: .25rem; font-weight: 600; }
+    .contact-value { font-size: 1rem; font-weight: 600; color: var(--text); }
+
+    /* ── GAME TABS ── */
+    .game-tabs {
+      display: flex;
+      gap: .5rem;
+      margin-bottom: 2.5rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: .3rem;
+      width: fit-content;
+    }
+
+    .game-tab {
+      padding: .5rem 1.4rem;
+      border-radius: 7px;
+      font-size: .88rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      transition: all .2s;
+    }
+
+    .game-tab.active {
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      box-shadow: 0 2px 10px rgba(79,142,247,.3);
+    }
+
+    .game-panel { display: none; }
+    .game-panel.active { display: block; }
+
+    /* ── SUDOKU ── */
+    .sudoku-wrapper {
+      display: flex;
+      gap: 2.5rem;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .sudoku-board {
+      display: grid;
+      grid-template-columns: repeat(9, 1fr);
+      border: 2px solid var(--accent);
+      border-radius: 8px;
+      overflow: hidden;
+      width: min(360px, 95vw);
+      aspect-ratio: 1;
+      flex-shrink: 0;
+    }
+
+    .sudoku-cell {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: clamp(.75rem, 2.5vw, 1.1rem);
+      font-weight: 600;
+      cursor: pointer;
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      user-select: none;
+      transition: background .15s, color .15s;
+      aspect-ratio: 1;
+    }
+
+    .sudoku-cell:nth-child(3n):not(:nth-child(9n))   { border-right: 2px solid var(--accent); }
+    .sudoku-cell:nth-child(n+19):nth-child(-n+27),
+    .sudoku-cell:nth-child(n+46):nth-child(-n+54)    { border-bottom: 2px solid var(--accent); }
+
+    .sudoku-cell.given   { color: var(--accent); background: #0d1428; }
+    .sudoku-cell.selected { background: rgba(79,142,247,.25) !important; }
+    .sudoku-cell.error   { color: #ff6b6b !important; background: rgba(255,107,107,.12) !important; }
+    .sudoku-cell.hint    { color: var(--accent3); background: rgba(6,214,160,.1); }
+    .sudoku-cell:not(.given):hover { background: var(--surface); }
+
+    .sudoku-controls {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .sudoku-controls h3 { margin-bottom: .6rem; }
+    .sudoku-controls p  { color: var(--muted); font-size: .88rem; margin-bottom: 1.2rem; line-height: 1.5; }
+
+    .sudoku-numpad {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: .4rem;
+      margin-bottom: 1.2rem;
+    }
+
+    .sudoku-numpad button {
+      padding: .55rem .3rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--text);
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .sudoku-numpad button:hover { background: var(--accent); color: #fff; }
+
+    .sudoku-action-row {
+      display: flex;
+      gap: .6rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .sudoku-action-row button {
+      flex: 1;
+      padding: .5rem .8rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+      color: var(--muted);
+      font-size: .82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+    }
+
+    .sudoku-action-row button:hover { border-color: var(--accent); color: var(--accent); }
+
+    .sudoku-status {
+      font-size: .85rem;
+      color: var(--muted);
+      min-height: 1.4em;
+    }
+
+    .sudoku-timer {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--accent3);
+      font-variant-numeric: tabular-nums;
+      margin-bottom: .5rem;
+    }
+
+    .sudoku-difficulty {
+      display: flex;
+      gap: .4rem;
+      margin-bottom: 1rem;
+    }
+
+    .sudoku-difficulty button {
+      flex: 1;
+      padding: .35rem;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-size: .78rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .15s;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .sudoku-difficulty button.active,
+    .sudoku-difficulty button:hover { background: var(--accent2); color: #fff; border-color: var(--accent2); }
+
+    .sudoku-tips {
+      margin-top: 1.4rem;
+      padding: 1rem 1.1rem;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: .82rem;
+    }
+
+    .sudoku-tips-title {
+      font-size: .75rem;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: .55rem;
+    }
+
+    .sudoku-tip-row {
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      margin-bottom: .35rem;
+      flex-wrap: wrap;
+    }
+
+    .sudoku-key {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 1.55rem;
+      padding: .15rem .35rem;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      color: var(--text);
+      font-size: .78rem;
+      font-weight: 700;
+      font-family: monospace;
+      line-height: 1.3;
+      white-space: nowrap;
+    }
+
+    .sudoku-tip-desc {
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    .sudoku-tip-rule {
+      color: var(--muted);
+      line-height: 1.45;
+    }
+
+    /* ── MOBILE ── */
+    @media (max-width: 600px) {
+      nav { padding: 0 1.2rem; }
+      .nav-links { gap: 1rem; }
+      section { padding: 70px 1.4rem; }
+      #stats { padding: 40px 1.4rem; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="particles-canvas"></canvas>
+<div class="cursor-glow" id="cursorGlow"></div>
+
+<!-- NAV -->
+<nav>
+  <span class="nav-logo">Armen Hovsepyan</span>
+  <ul class="nav-links">
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#game-section" class="nav-game-btn">🎮 Play</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg-grid"></div>
+  <div class="hero-content">
+    <div class="hero-badge">
+      <div class="hero-badge-dot"></div>
+      Available for new opportunities
+    </div>
+    <h1>Armen<br><span class="gradient-text">Hovsepyan</span></h1>
+    <p class="hero-role">Gameplay Systems Engineer &amp; Team Lead</p>
+    <div class="typewriter-wrap"><span id="typewriter"></span></div>
+    <p class="hero-summary">
+      Software engineer with 9+ years of experience — 4 years in web development and 5 years in game engineering.
+      Specialized in Gameplay Systems, Multiplayer Networking, and Backend Integration using Unreal Engine and C++.
+      Led a 10-person gameplay team at NeographGames, part of the international WilderWorld project.
+    </p>
+    <div class="hero-tags">
+      <span class="tag">UE4 / UE5</span>
+      <span class="tag">C++</span>
+      <span class="tag">Blueprint</span>
+      <span class="tag">UE Replication</span>
+      <span class="tag">RPCs</span>
+      <span class="tag">MongoDB</span>
+      <span class="tag">Dedicated Server</span>
+      <span class="tag">Linux</span>
+      <span class="tag">Docker</span>
+      <span class="tag">Git</span>
+      <span class="tag">JavaScript</span>
+      <span class="tag">AI Dev</span>
+    </div>
+    <div class="hero-cta">
+      <a href="#experience" class="btn btn-primary">View Experience</a>
+      <a href="#game-section" class="btn btn-game">🎮 Play a Game</a>
+      <a href="#skills" class="btn btn-outline">Skills</a>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div id="stats">
+  <div class="stats-grid">
+    <div class="stat-item reveal">
+      <div class="stat-number" data-target="9">0</div>
+      <div class="stat-label">Years of Experience</div>
+    </div>
+    <div class="stat-item reveal">
+      <div class="stat-number" data-target="10">0</div>
+      <div class="stat-label">Engineers Led</div>
+    </div>
+    <div class="stat-item reveal">
+      <div class="stat-number" data-target="5">0</div>
+      <div class="stat-label">Years in Game Eng.</div>
+    </div>
+    <div class="stat-item reveal">
+      <div class="stat-number" data-target="4">0</div>
+      <div class="stat-label">Core Systems Shipped</div>
+    </div>
+  </div>
+</div>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-label">Career</div>
+  <h2>Work Experience</h2>
+
+  <div class="exp-card reveal">
+    <div class="exp-header">
+      <div>
+        <div class="exp-role">Gameplay Team Lead</div>
+        <div class="exp-company">NeographGames — part of WilderWorld (International Project)</div>
+      </div>
+      <div class="exp-period">2022 – 2026</div>
+    </div>
+    <ul class="exp-bullets">
+      <li>Led a 10-person gameplay engineering team: daily planning, sprint reviews, code reviews, and task priority management.</li>
+      <li>Architected and delivered core gameplay systems: Leaderboard, Missions, Game Nights, and Notifications — with external data management and reliable daily automated resets.</li>
+      <li>Designed a flexible MongoDB data architecture for player statistics, enabling any analytics query from the community team without predefined schema constraints.</li>
+      <li>Developed a C++ system for serializing and deserializing structured data to/from JSON and CSV formats.</li>
+      <li>Built and maintained multiplayer features using UE Actor Replication, RPCs (Server, Client, NetMulticast), and Dedicated Server.</li>
+      <li>Coordinated with DevOps on data pipelines and scheduled tasks; managed tasks using Linear.</li>
+    </ul>
+  </div>
+
+  <div class="exp-card reveal">
+    <div class="exp-header">
+      <div>
+        <div class="exp-role">Gameplay &amp; Backend Engineer</div>
+        <div class="exp-company">NeographGames — part of WilderWorld (International Project)</div>
+      </div>
+      <div class="exp-period">2021 – 2022</div>
+    </div>
+    <ul class="exp-bullets">
+      <li>Implemented core gameplay mechanics and systems in C++ and Unreal Engine Blueprint.</li>
+      <li>Built multiplayer features leveraging UE Actor Replication and the Authority / Autonomous Proxy / Simulated Proxy model.</li>
+      <li>Designed and integrated MongoDB database layer for player data, rewards, statistics, and leaderboard.</li>
+      <li>Worked within an Agile team using Git and Linear for version control and project tracking.</li>
+    </ul>
+  </div>
+
+  <div class="exp-card reveal">
+    <div class="exp-header">
+      <div>
+        <div class="exp-role">Frontend Developer</div>
+        <div class="exp-company">D-Link</div>
+      </div>
+      <div class="exp-period">2017 – 2021</div>
+    </div>
+    <ul class="exp-bullets">
+      <li>Developed a web-based router management interface using AngularJS and JavaScript — covering IP configuration, DHCP, firewall rules, and network monitoring.</li>
+      <li>Gained strong practical knowledge of networking protocols: TCP/IP, DNS, DHCP, routing, and firewall management.</li>
+      <li>Built a full-stack side project using PHP, AngularJS, and PostgreSQL.</li>
+      <li>Managed application deployments using Docker on Linux environments.</li>
+      <li>Used Git for version control and Redmine for project management.</li>
+    </ul>
+  </div>
+
+  <div class="exp-card reveal">
+    <div class="exp-header">
+      <div>
+        <div class="exp-role">Linux Instructor (Part-time)</div>
+        <div class="exp-company">University</div>
+      </div>
+      <div class="exp-period">2019 – 2021</div>
+    </div>
+    <ul class="exp-bullets">
+      <li>Taught Linux system administration to university students for 2 years.</li>
+      <li>Topics: shell scripting, file systems, networking, server setup, process management, and user administration.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label">Expertise</div>
+  <h2>Technical Skills</h2>
+  <div class="skills-grid">
+
+    <div class="skill-card reveal">
+      <div class="skill-card-header">
+        <div class="skill-icon" style="background:rgba(79,142,247,.12);">🎮</div>
+        <div class="skill-category">Game Engineering</div>
+      </div>
+      <div class="skill-tags">
+        <span class="skill-tag">Unreal Engine 4</span>
+        <span class="skill-tag">Unreal Engine 5</span>
+        <span class="skill-tag">C++</span>
+        <span class="skill-tag">Blueprint</span>
+        <span class="skill-tag">Gameplay Systems</span>
+      </div>
+    </div>
+
+    <div class="skill-card reveal">
+      <div class="skill-card-header">
+        <div class="skill-icon" style="background:rgba(139,92,246,.12);">🌐</div>
+        <div class="skill-category">Multiplayer & Networking</div>
+      </div>
+      <div class="skill-tags">
+        <span class="skill-tag">UE Actor Replication</span>
+        <span class="skill-tag">Server RPC</span>
+        <span class="skill-tag">Client RPC</span>
+        <span class="skill-tag">NetMulticast</span>
+        <span class="skill-tag">Dedicated Server</span>
+        <span class="skill-tag">Authority / Proxy</span>
+      </div>
+    </div>
+
+    <div class="skill-card reveal">
+      <div class="skill-card-header">
+        <div class="skill-icon" style="background:rgba(6,214,160,.1);">🗄️</div>
+        <div class="skill-category">Databases & Backend</div>
+      </div>
+      <div class="skill-tags">
+        <span class="skill-tag">MongoDB</span>
+        <span class="skill-tag">PostgreSQL</span>
+        <span class="skill-tag">JSON / CSV</span>
+        <span class="skill-tag">Data Architecture</span>
+        <span class="skill-tag">C++ Serialization</span>
+      </div>
+    </div>
+
+    <div class="skill-card reveal">
+      <div class="skill-card-header">
+        <div class="skill-icon" style="background:rgba(79,142,247,.12);">💻</div>
+        <div class="skill-category">Web Development</div>
+      </div>
+      <div class="skill-tags">
+        <span class="skill-tag">JavaScript</span>
+        <span class="skill-tag">AngularJS</span>
+        <span class="skill-tag">PHP</span>
+        <span class="skill-tag">TCP/IP</span>
+        <span class="skill-tag">DNS / DHCP</span>
+        <span class="skill-tag">Firewall</span>
+      </div>
+    </div>
+
+    <div class="skill-card reveal">
+      <div class="skill-card-header">
+        <div class="skill-icon" style="background:rgba(139,92,246,.12);">⚙️</div>
+        <div class="skill-category">DevOps & Systems</div>
+      </div>
+      <div class="skill-tags">
+        <span class="skill-tag">Linux (Advanced)</span>
+        <span class="skill-tag">Docker</span>
+        <span class="skill-tag">Git (Advanced)</span>
+        <span class="skill-tag">Shell Scripting</span>
+        <span class="skill-tag">Vim</span>
+        <span class="skill-tag">Server Setup</span>
+      </div>
+    </div>
+
+    <div class="skill-card reveal">
+      <div class="skill-card-header">
+        <div class="skill-icon" style="background:rgba(6,214,160,.1);">🤖</div>
+        <div class="skill-category">AI-Assisted Dev</div>
+      </div>
+      <div class="skill-tags">
+        <span class="skill-tag">Cursor</span>
+        <span class="skill-tag">Claude</span>
+        <span class="skill-tag">ChatGPT</span>
+        <span class="skill-tag">Daily Workflow</span>
+      </div>
+    </div>
+
+    <div class="skill-card reveal">
+      <div class="skill-card-header">
+        <div class="skill-icon" style="background:rgba(79,142,247,.12);">📋</div>
+        <div class="skill-category">Project Management</div>
+      </div>
+      <div class="skill-tags">
+        <span class="skill-tag">Team Lead (10 ppl)</span>
+        <span class="skill-tag">Agile</span>
+        <span class="skill-tag">Code Review</span>
+        <span class="skill-tag">Linear</span>
+        <span class="skill-tag">Redmine</span>
+      </div>
+    </div>
+
+    <div class="skill-card reveal">
+      <div class="skill-card-header">
+        <div class="skill-icon" style="background:rgba(139,92,246,.12);">🐍</div>
+        <div class="skill-category">Other</div>
+      </div>
+      <div class="skill-tags">
+        <span class="skill-tag">Python (Basic)</span>
+        <span class="skill-tag">Data Pipelines</span>
+        <span class="skill-tag">Scheduled Tasks</span>
+        <span class="skill-tag">Automated Resets</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- MINI GAME -->
+<section id="game-section">
+  <div class="section-label">Easter Egg</div>
+  <h2>Take a Break <span style="color:var(--accent3);">/ Arcade</span></h2>
+
+  <div class="game-tabs">
+    <button class="game-tab active" onclick="switchGame('snake')">🐍 Snake</button>
+    <button class="game-tab" onclick="switchGame('pong')">🏓 Pong</button>
+    <button class="game-tab" onclick="switchGame('sudoku')">🧩 Sudoku</button>
+  </div>
+
+  <!-- SNAKE TAB -->
+  <div class="game-panel active" id="panel-snake">
+    <div class="game-wrapper">
+      <div class="game-info">
+        <h3>Snake — Classic Arcade</h3>
+        <p>
+          Building gameplay systems for a living means I know what makes a game feel good.
+          Collect food, avoid yourself, level up.
+        </p>
+        <ul class="game-controls-list">
+          <li><span class="key">↑ ↓ ← →</span> or <span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span> — Move</li>
+          <li><span class="key">Space</span> — Start / Pause / Restart</li>
+          <li><span class="key">P</span> — Pause</li>
+        </ul>
+        <div class="game-score-display">
+          <div class="score-box">
+            <div class="score-value" id="score-display">0</div>
+            <div class="score-label">Score</div>
+          </div>
+          <div class="score-box">
+            <div class="score-value" id="best-display">0</div>
+            <div class="score-label">Best</div>
+          </div>
+          <div class="score-box">
+            <div class="score-value" id="level-display">1</div>
+            <div class="score-label">Level</div>
+          </div>
+        </div>
+      </div>
+      <div class="game-container">
+        <canvas id="snake-canvas" width="340" height="340"></canvas>
+        <div class="game-overlay" id="game-overlay">
+          <div class="game-overlay-title" id="overlay-title">🐍 SNAKE</div>
+          <div class="game-overlay-sub" id="overlay-sub">Press Space or click to start</div>
+          <div class="game-overlay-score" id="overlay-score" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PONG TAB -->
+  <div class="game-panel" id="panel-pong">
+    <div class="game-wrapper">
+      <div class="game-info">
+        <h3>Pong — vs AI</h3>
+        <p>
+          You're on the right. AI is on the left.
+          First to 7 wins. The AI gets smarter every round you beat it.
+        </p>
+        <ul class="game-controls-list">
+          <li><span class="key">↑ ↓</span> or <span class="key">W</span><span class="key">S</span> — Move paddle</li>
+          <li><span class="key">Space</span> — Start / Pause / Restart</li>
+        </ul>
+        <div class="game-score-display">
+          <div class="score-box">
+            <div class="score-value" id="pong-ai-score">0</div>
+            <div class="score-label">AI</div>
+          </div>
+          <div class="score-box">
+            <div class="score-value" id="pong-player-score">0</div>
+            <div class="score-label">You</div>
+          </div>
+          <div class="score-box">
+            <div class="score-value" id="pong-wins">0</div>
+            <div class="score-label">Wins</div>
+          </div>
+        </div>
+      </div>
+      <div class="game-container">
+        <canvas id="pong-canvas" width="480" height="340"></canvas>
+        <div class="game-overlay" id="pong-overlay">
+          <div class="game-overlay-title" id="pong-overlay-title">🏓 PONG</div>
+          <div class="game-overlay-sub" id="pong-overlay-sub">Press Space or click to start</div>
+          <div class="game-overlay-score" id="pong-overlay-score" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUDOKU TAB -->
+  <div class="game-panel" id="panel-sudoku">
+    <div class="sudoku-wrapper">
+      <div id="sudoku-board" class="sudoku-board"></div>
+      <div class="sudoku-controls">
+        <h3>Sudoku</h3>
+        <p>Fill every row, column and 3×3 box with digits 1–9. Click a cell, then press a key or use the numpad below.</p>
+
+        <div class="sudoku-difficulty">
+          <button class="active" onclick="sudokuSetDiff('easy')">Easy</button>
+          <button onclick="sudokuSetDiff('medium')">Medium</button>
+          <button onclick="sudokuSetDiff('hard')">Hard</button>
+        </div>
+
+        <div class="sudoku-timer" id="sudoku-timer">0:00</div>
+
+        <div class="sudoku-numpad">
+          <button onclick="sudokuInput(1)">1</button>
+          <button onclick="sudokuInput(2)">2</button>
+          <button onclick="sudokuInput(3)">3</button>
+          <button onclick="sudokuInput(4)">4</button>
+          <button onclick="sudokuInput(5)">5</button>
+          <button onclick="sudokuInput(6)">6</button>
+          <button onclick="sudokuInput(7)">7</button>
+          <button onclick="sudokuInput(8)">8</button>
+          <button onclick="sudokuInput(9)">9</button>
+          <button onclick="sudokuInput(0)">✕</button>
+        </div>
+
+        <div class="sudoku-action-row">
+          <button onclick="sudokuHint()">💡 Hint</button>
+          <button onclick="sudokuValidate()">✔ Check</button>
+          <button onclick="sudokuNew()">🔄 New Game</button>
+        </div>
+
+        <div class="sudoku-status" id="sudoku-status">Select a cell to begin</div>
+
+        <div class="sudoku-tips">
+          <div class="sudoku-tips-title">⌨ Shortcuts</div>
+          <div class="sudoku-tip-row"><span class="sudoku-key">1</span>–<span class="sudoku-key">9</span><span class="sudoku-tip-desc">Enter digit</span></div>
+          <div class="sudoku-tip-row"><span class="sudoku-key">⌫</span><span class="sudoku-tip-desc">Erase cell</span></div>
+          <div class="sudoku-tip-row"><span class="sudoku-key">↑</span><span class="sudoku-key">↓</span><span class="sudoku-key">←</span><span class="sudoku-key">→</span><span class="sudoku-tip-desc">Navigate</span></div>
+          <div class="sudoku-tips-title" style="margin-top:.9rem;">📋 Rules</div>
+          <div class="sudoku-tip-row sudoku-tip-rule">Each row must contain 1–9 with no repeats.</div>
+          <div class="sudoku-tip-row sudoku-tip-rule">Each column must contain 1–9 with no repeats.</div>
+          <div class="sudoku-tip-row sudoku-tip-rule">Each 3×3 box must contain 1–9 with no repeats.</div>
+          <div class="sudoku-tips-title" style="margin-top:.9rem;">💡 Tips</div>
+          <div class="sudoku-tip-row sudoku-tip-rule">Start with rows/columns/boxes that already have the most digits.</div>
+          <div class="sudoku-tip-row sudoku-tip-rule">You have <strong>3 hints</strong> per game — use them wisely!</div>
+          <div class="sudoku-tip-row sudoku-tip-rule">Use <em>Check</em> to spot errors before they cascade.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">Background</div>
+  <h2>Education &amp; Languages</h2>
+  <div class="about-grid">
+
+    <div class="info-card reveal">
+      <div class="info-card-label">Education</div>
+      <h3>Master of Engineering</h3>
+      <div class="subtitle">State Engineering University of Armenia · 2017</div>
+      <div class="detail">
+        Textile and Light Industry Products.<br>
+        Advanced engineering studies covering algorithms, software architecture, and systems design.
+      </div>
+    </div>
+
+    <div class="info-card reveal">
+      <div class="info-card-label">Languages</div>
+      <div class="lang-list">
+        <div class="lang-item">
+          <div class="lang-meta">
+            <span class="lang-name">Armenian</span>
+            <span class="lang-level">Native</span>
+          </div>
+          <div class="lang-bar-wrap"><div class="lang-bar" style="--w:100%"></div></div>
+        </div>
+        <div class="lang-item">
+          <div class="lang-meta">
+            <span class="lang-name">Russian</span>
+            <span class="lang-level">Native</span>
+          </div>
+          <div class="lang-bar-wrap"><div class="lang-bar" style="--w:100%"></div></div>
+        </div>
+        <div class="lang-item">
+          <div class="lang-meta">
+            <span class="lang-name">English</span>
+            <span class="lang-level">Intermediate (B1)</span>
+          </div>
+          <div class="lang-bar-wrap"><div class="lang-bar" style="--w:55%"></div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <h2>Contact</h2>
+  <div class="contact-grid">
+
+    <a class="contact-card reveal" href="mailto:your@email.com"><!-- TODO: replace with real email -->
+      <div class="contact-icon" style="background:rgba(79,142,247,.12);">✉️</div>
+      <div class="contact-info">
+        <div class="contact-label">Email</div>
+        <div class="contact-value">your@email.com</div>
+      </div>
+    </a>
+
+    <a class="contact-card reveal" href="tel:+374XXXXXXXXX"><!-- TODO: replace with real phone -->
+      <div class="contact-icon" style="background:rgba(6,214,160,.1);">📱</div>
+      <div class="contact-info">
+        <div class="contact-label">Phone</div>
+        <div class="contact-value">+374 XX XXX XXXX</div>
+      </div>
+    </a>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p>Armen Hovsepyan · Gameplay Systems Engineer &amp; Team Lead<br>
+  <span style="font-size:.75rem; margin-top:.4rem; display:block;">Built with HTML, CSS &amp; vanilla JS</span></p>
+</footer>
+
+<script>
+/* ═══════════════════════ PARTICLES ═══════════════════════ */
+(function() {
+  const canvas = document.getElementById('particles-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  class Particle {
+    constructor() { this.reset(true); }
+    reset(initial) {
+      this.x = Math.random() * W;
+      this.y = initial ? Math.random() * H : H + 10;
+      this.size = Math.random() * 1.5 + .3;
+      this.speedY = -(Math.random() * .4 + .1);
+      this.speedX = (Math.random() - .5) * .15;
+      this.opacity = Math.random() * .4 + .1;
+      this.color = Math.random() > .5 ? '79,142,247' : '139,92,246';
+    }
+    update() {
+      this.y += this.speedY;
+      this.x += this.speedX;
+      if (this.y < -10) this.reset(false);
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${this.color},${this.opacity})`;
+      ctx.fill();
+    }
+  }
+
+  for (let i = 0; i < 80; i++) particles.push(new Particle());
+
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* ═══════════════════════ CURSOR GLOW ═══════════════════════ */
+const cursorGlow = document.getElementById('cursorGlow');
+document.addEventListener('mousemove', e => {
+  cursorGlow.style.left = e.clientX + 'px';
+  cursorGlow.style.top = e.clientY + 'px';
+});
+
+/* ═══════════════════════ TYPEWRITER ═══════════════════════ */
+(function() {
+  const phrases = [
+    'Gameplay Systems Engineer',
+    'Multiplayer Architecture',
+    'UE Actor Replication Expert',
+    'Team Lead @ NeographGames',
+    'C++ & Unreal Engine',
+    'MongoDB Data Architect',
+    'Linux Power User',
+    'AI-Assisted Developer',
+  ];
+  const el = document.getElementById('typewriter');
+  let pi = 0, ci = 0, deleting = false, wait = 0;
+
+  function tick() {
+    const phrase = phrases[pi];
+    if (!deleting) {
+      el.textContent = phrase.slice(0, ci + 1);
+      ci++;
+      if (ci === phrase.length) { deleting = true; wait = 60; }
+    } else {
+      if (wait-- > 0) { setTimeout(tick, 30); return; }
+      el.textContent = phrase.slice(0, ci - 1);
+      ci--;
+      if (ci === 0) { deleting = false; pi = (pi + 1) % phrases.length; }
+    }
+    setTimeout(tick, deleting ? 40 : 80);
+  }
+  setTimeout(tick, 600);
+})();
+
+/* ═══════════════════════ SCROLL REVEAL ═══════════════════════ */
+const observer = new IntersectionObserver(entries => {
+  entries.forEach((e, i) => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+
+document.querySelectorAll('.reveal').forEach((el, idx) => {
+  el.style.transitionDelay = `${(idx % 5) * 0.07}s`;
+  observer.observe(el);
+});
+
+/* ═══════════════════════ COUNT-UP STATS ═══════════════════════ */
+const statObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const el = e.target.querySelector('[data-target]');
+      if (!el) return;
+      const target = parseInt(el.dataset.target);
+      let cur = 0;
+      const step = Math.ceil(target / 20);
+      const iv = setInterval(() => {
+        cur = Math.min(cur + step, target);
+        el.textContent = cur + '+';
+        if (cur >= target) clearInterval(iv);
+      }, 50);
+      statObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+
+document.querySelectorAll('.stat-item').forEach(el => statObserver.observe(el));
+
+/* ═══════════════════════ LANGUAGE BARS ═══════════════════════ */
+const barObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.lang-bar').forEach(bar => {
+        const w = bar.style.getPropertyValue('--w') || '100%';
+        bar.style.transform = `scaleX(${parseFloat(w)/100})`;
+        bar.classList.add('animate');
+      });
+      barObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+
+document.querySelectorAll('.info-card').forEach(el => barObserver.observe(el));
+
+/* ═══════════════════════ SKILL CARD MOUSE GLOW ═══════════════════════ */
+document.querySelectorAll('.skill-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width * 100).toFixed(1);
+    const y = ((e.clientY - r.top) / r.height * 100).toFixed(1);
+    card.style.setProperty('--mx', x + '%');
+    card.style.setProperty('--my', y + '%');
+  });
+});
+
+/* ═══════════════════════════════════════════════
+   SNAKE GAME
+═══════════════════════════════════════════════ */
+(function() {
+  const canvas = document.getElementById('snake-canvas');
+  const ctx    = canvas.getContext('2d');
+  const COLS = 17, ROWS = 17;
+  const CELL  = Math.floor(canvas.width / COLS);
+
+  const overlay     = document.getElementById('game-overlay');
+  const titleEl     = document.getElementById('overlay-title');
+  const subEl       = document.getElementById('overlay-sub');
+  const scoreEl     = document.getElementById('overlay-score');
+  const scoreDisp   = document.getElementById('score-display');
+  const bestDisp    = document.getElementById('best-display');
+  const levelDisp   = document.getElementById('level-display');
+
+  // Colors
+  const C = {
+    bg:        '#050709',
+    grid:      'rgba(79,142,247,.04)',
+    head:      '#06d6a0',
+    headGlow:  'rgba(6,214,160,.8)',
+    body:      '#4f8ef7',
+    bodyDark:  '#2a5ebf',
+    food:      '#f72585',
+    foodGlow:  'rgba(247,37,133,.8)',
+    bonus:     '#ffd166',
+    bonusGlow: 'rgba(255,209,102,.8)',
+    wall:      '#1a1e2a',
+    text:      '#e2e8f0',
+    muted:     '#6b7a99',
+  };
+
+  let snake, dir, nextDir, food, bonus, score, best, level,
+      speed, state, frameId, tick, bonusTimer;
+
+  // state: 'idle' | 'running' | 'paused' | 'dead'
+
+  function rnd(max) { return Math.floor(Math.random() * max); }
+
+  function freeCell() {
+    const occupied = new Set(snake.map(s => s.x + ',' + s.y));
+    let c;
+    do { c = { x: rnd(COLS), y: rnd(ROWS) }; }
+    while (occupied.has(c.x + ',' + c.y));
+    return c;
+  }
+
+  function spawnFood() {
+    food = freeCell();
+    food.anim = 0;
+  }
+
+  function spawnBonus() {
+    if (bonus) return;
+    bonus = freeCell();
+    bonus.anim = 0;
+    bonusTimer = 120 + rnd(60); // frames until it disappears
+  }
+
+  function init() {
+    snake = [
+      { x: 8, y: 8 },
+      { x: 7, y: 8 },
+      { x: 6, y: 8 },
+    ];
+    dir = nextDir = { x: 1, y: 0 };
+    score = 0;
+    level = 1;
+    speed = 130;
+    bonus = null;
+    bonusTimer = 0;
+    tick = 0;
+    best = parseInt(localStorage.getItem('snake_best') || '0');
+    spawnFood();
+    updateHUD();
+  }
+
+  function updateHUD() {
+    scoreDisp.textContent = score;
+    bestDisp.textContent  = best;
+    levelDisp.textContent = level;
+  }
+
+  function setOverlay(show, title, sub, sc) {
+    overlay.classList.toggle('hidden', !show);
+    if (title !== undefined) titleEl.textContent = title;
+    if (sub   !== undefined) subEl.textContent   = sub;
+    if (sc !== undefined) {
+      scoreEl.style.display = 'block';
+      scoreEl.textContent = 'Score: ' + sc;
+    } else {
+      scoreEl.style.display = 'none';
+    }
+  }
+
+  function start() {
+    init();
+    state = 'running';
+    setOverlay(false);
+    schedule();
+  }
+
+  function pause() {
+    if (state !== 'running' && state !== 'paused') return;
+    if (state === 'running') {
+      state = 'paused';
+      cancelAnimationFrame(frameId);
+      setOverlay(true, '⏸ PAUSED', 'Press P or Space to resume');
+    } else {
+      state = 'running';
+      setOverlay(false);
+      lastTime = performance.now();
+      schedule();
+    }
+  }
+
+  let lastTime = 0, accum = 0;
+
+  function schedule() {
+    lastTime = performance.now();
+    accum = 0;
+    frameId = requestAnimationFrame(loop);
+  }
+
+  function loop(now) {
+    if (state !== 'running') return;
+    accum += now - lastTime;
+    lastTime = now;
+    if (accum >= speed) {
+      accum -= speed;
+      update();
+    }
+    draw();
+    frameId = requestAnimationFrame(loop);
+  }
+
+  function update() {
+    tick++;
+
+    // Apply direction
+    dir = nextDir;
+
+    const head = { x: snake[0].x + dir.x, y: snake[0].y + dir.y };
+
+    // Wall collision
+    if (head.x < 0 || head.x >= COLS || head.y < 0 || head.y >= ROWS) {
+      die(); return;
+    }
+
+    // Self collision
+    if (snake.some(s => s.x === head.x && s.y === head.y)) {
+      die(); return;
+    }
+
+    snake.unshift(head);
+
+    // Eat food
+    if (head.x === food.x && head.y === food.y) {
+      score += 10 * level;
+      if (score > best) { best = score; localStorage.setItem('snake_best', best); }
+      level = Math.floor(score / 80) + 1;
+      speed = Math.max(55, 130 - (level - 1) * 12);
+      spawnFood();
+      updateHUD();
+      if (score % 50 === 0 || (tick % 40 === 0 && !bonus)) spawnBonus();
+    } else {
+      snake.pop();
+    }
+
+    // Eat bonus
+    if (bonus && head.x === bonus.x && head.y === bonus.y) {
+      score += 30 * level;
+      if (score > best) { best = score; localStorage.setItem('snake_best', best); }
+      updateHUD();
+      bonus = null;
+    }
+
+    // Bonus timer
+    if (bonus) {
+      food.anim = (food.anim + 1) % 60;
+      bonus.anim = (bonus.anim + 1) % 60;
+      bonusTimer--;
+      if (bonusTimer <= 0) bonus = null;
+    } else {
+      food.anim = (food.anim + 1) % 60;
+    }
+
+    // Occasional bonus spawn
+    if (!bonus && tick % 80 === 0) spawnBonus();
+  }
+
+  function die() {
+    state = 'dead';
+    cancelAnimationFrame(frameId);
+    draw();
+    setTimeout(() => {
+      setOverlay(true, '💀 GAME OVER', 'Press Space to restart', score);
+    }, 300);
+  }
+
+  /* ── DRAW ── */
+  function drawCell(x, y, color, glow, radius) {
+    const px = x * CELL + 1, py = y * CELL + 1;
+    const sz = CELL - 2;
+    const r = radius || 4;
+    ctx.beginPath();
+    ctx.roundRect(px, py, sz, sz, r);
+    if (glow) {
+      ctx.shadowBlur = 14;
+      ctx.shadowColor = glow;
+    }
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  function drawPulse(x, y, color, glowColor, anim) {
+    const pulse = Math.sin(anim * Math.PI / 30) * .12 + 1;
+    const px = x * CELL + CELL / 2;
+    const py = y * CELL + CELL / 2;
+    ctx.save();
+    ctx.translate(px, py);
+    ctx.scale(pulse, pulse);
+    ctx.translate(-px, -py);
+    drawCell(x, y, color, glowColor, 6);
+    ctx.restore();
+  }
+
+  function draw() {
+    // Background
+    ctx.fillStyle = C.bg;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Grid
+    ctx.strokeStyle = C.grid;
+    ctx.lineWidth = .5;
+    for (let c = 0; c <= COLS; c++) {
+      ctx.beginPath(); ctx.moveTo(c * CELL, 0); ctx.lineTo(c * CELL, canvas.height); ctx.stroke();
+    }
+    for (let r = 0; r <= ROWS; r++) {
+      ctx.beginPath(); ctx.moveTo(0, r * CELL); ctx.lineTo(canvas.width, r * CELL); ctx.stroke();
+    }
+
+    // Snake body
+    for (let i = snake.length - 1; i >= 1; i--) {
+      const t = i / snake.length;
+      ctx.globalAlpha = Math.max(0.3, 1 - t * 0.6);
+      drawCell(snake[i].x, snake[i].y, C.body, null, 4);
+    }
+    ctx.globalAlpha = 1;
+
+    // Snake head
+    drawCell(snake[0].x, snake[0].y, C.head, C.headGlow, 5);
+
+    // Eyes
+    const hx = snake[0].x * CELL, hy = snake[0].y * CELL;
+    const eyeSize = 2.5;
+    const eyeOffset = 4;
+    ctx.fillStyle = '#000';
+    if (dir.x === 1)  { ctx.fillRect(hx+CELL-6, hy+eyeOffset,   eyeSize, eyeSize); ctx.fillRect(hx+CELL-6, hy+CELL-eyeOffset-eyeSize, eyeSize, eyeSize); }
+    if (dir.x === -1) { ctx.fillRect(hx+3,       hy+eyeOffset,   eyeSize, eyeSize); ctx.fillRect(hx+3,       hy+CELL-eyeOffset-eyeSize, eyeSize, eyeSize); }
+    if (dir.y === -1) { ctx.fillRect(hx+eyeOffset, hy+3, eyeSize, eyeSize); ctx.fillRect(hx+CELL-eyeOffset-eyeSize, hy+3, eyeSize, eyeSize); }
+    if (dir.y === 1)  { ctx.fillRect(hx+eyeOffset, hy+CELL-6, eyeSize, eyeSize); ctx.fillRect(hx+CELL-eyeOffset-eyeSize, hy+CELL-6, eyeSize, eyeSize); }
+
+    // Food
+    if (food) drawPulse(food.x, food.y, C.food, C.foodGlow, food.anim);
+
+    // Bonus
+    if (bonus) {
+      const flash = bonusTimer < 30 ? (bonusTimer % 6 < 3) : true;
+      if (flash) drawPulse(bonus.x, bonus.y, C.bonus, C.bonusGlow, bonus.anim);
+    }
+
+    // Death overlay flash
+    if (state === 'dead') {
+      ctx.fillStyle = 'rgba(247,37,133,.07)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  /* ── CONTROLS ── */
+  const DIR = {
+    ArrowUp:    { x: 0, y:-1 }, w: { x: 0, y:-1 }, W: { x: 0, y:-1 },
+    ArrowDown:  { x: 0, y: 1 }, s: { x: 0, y: 1 }, S: { x: 0, y: 1 },
+    ArrowLeft:  { x:-1, y: 0 }, a: { x:-1, y: 0 }, A: { x:-1, y: 0 },
+    ArrowRight: { x: 1, y: 0 }, d: { x: 1, y: 0 }, D: { x: 1, y: 0 },
+  };
+
+  const gameSection = document.getElementById('game-section');
+
+  document.addEventListener('keydown', e => {
+    const newDir = DIR[e.key];
+    if (newDir) {
+      // Prevent reversing
+      if (newDir.x !== -dir.x || newDir.y !== -dir.y) {
+        nextDir = newDir;
+      }
+      // Prevent page scroll when game is in view
+      if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.key)) {
+        const r = gameSection.getBoundingClientRect();
+        if (r.top < window.innerHeight && r.bottom > 0) e.preventDefault();
+      }
+    }
+    if (e.key === ' ') {
+      e.preventDefault();
+      if (state === 'idle' || state === 'dead') start();
+      else if (state === 'running' || state === 'paused') pause();
+    }
+    if (e.key === 'p' || e.key === 'P') pause();
+  });
+
+  // Touch support
+  let touchStart = null;
+  canvas.addEventListener('touchstart', e => { touchStart = e.touches[0]; e.preventDefault(); }, { passive: false });
+  canvas.addEventListener('touchend', e => {
+    if (!touchStart) return;
+    const dx = e.changedTouches[0].clientX - touchStart.clientX;
+    const dy = e.changedTouches[0].clientY - touchStart.clientY;
+    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
+      if (state === 'idle' || state === 'dead') start();
+      else pause();
+      return;
+    }
+    let newDir;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      newDir = dx > 0 ? { x: 1, y: 0 } : { x: -1, y: 0 };
+    } else {
+      newDir = dy > 0 ? { x: 0, y: 1 } : { x: 0, y: -1 };
+    }
+    if (newDir.x !== -dir.x || newDir.y !== -dir.y) nextDir = newDir;
+    touchStart = null;
+    e.preventDefault();
+  }, { passive: false });
+
+  // Click overlay to start
+  overlay.addEventListener('click', () => {
+    if (state === 'idle' || state === 'dead') start();
+    else pause();
+  });
+
+  /* ── BOOT ── */
+  state = 'idle';
+  dir = nextDir = { x: 1, y: 0 };
+  snake = [{ x: 8, y: 8 }, { x: 7, y: 8 }, { x: 6, y: 8 }];
+  food = { x: 12, y: 8, anim: 0 };
+  score = 0; level = 1; tick = 0;
+  best = parseInt(localStorage.getItem('snake_best') || '0');
+  bestDisp.textContent = best;
+  draw();
+  setOverlay(true, '🐍 SNAKE', 'Press Space or click to start');
+
+})();
+
+/* ═══════════════════════ GAME TAB SWITCHER ═══════════════════════ */
+function switchGame(name) {
+  const order = ['snake', 'pong', 'sudoku'];
+  document.querySelectorAll('.game-tab').forEach((btn, idx) => {
+    btn.classList.toggle('active', idx === order.indexOf(name));
+  });
+  document.querySelectorAll('.game-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+/* ═══════════════════════════════════════════════
+   PONG GAME
+═══════════════════════════════════════════════ */
+(function() {
+  const canvas  = document.getElementById('pong-canvas');
+  const ctx     = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+
+  const overlay    = document.getElementById('pong-overlay');
+  const titleEl    = document.getElementById('pong-overlay-title');
+  const subEl      = document.getElementById('pong-overlay-sub');
+  const scoreEl    = document.getElementById('pong-overlay-score');
+  const aiScoreEl  = document.getElementById('pong-ai-score');
+  const plScoreEl  = document.getElementById('pong-player-score');
+  const winsEl     = document.getElementById('pong-wins');
+
+  const PW = 10, PH = 70, BALL_R = 7;
+  const WIN_SCORE = 7;
+
+  const C = {
+    bg:      '#030507',
+    net:     'rgba(255,255,255,.06)',
+    player:  '#4f8ef7',
+    ai:      '#8b5cf6',
+    ball:    '#06d6a0',
+    ballGlow:'rgba(6,214,160,.8)',
+    text:    '#e2e8f0',
+    muted:   '#6b7a99',
+    trail:   'rgba(6,214,160,.15)',
+  };
+
+  // State
+  let pState = 'idle'; // idle | running | paused | scored | over
+  let pAnimId, pLastTime;
+
+  // Game objects
+  let player, ai, ball, scores, wins, aiDiff, ballTrail;
+
+  function initGame() {
+    player = { x: W - PW - 12, y: H / 2 - PH / 2, dy: 0 };
+    ai     = { x: 12, y: H / 2 - PH / 2 };
+    ball   = newBall(1);
+    scores = { player: 0, ai: 0 };
+    wins   = parseInt(winsEl.textContent) || 0;
+    aiDiff = 0.055 + wins * 0.008; // AI speed factor, increases with wins
+    ballTrail = [];
+    updateHUD();
+  }
+
+  function newBall(dir) {
+    const angle = (Math.random() * 0.5 + 0.2) * (Math.random() > .5 ? 1 : -1);
+    const spd = 4.5;
+    return {
+      x: W / 2, y: H / 2,
+      vx: dir * spd * Math.cos(angle),
+      vy: spd * Math.sin(angle),
+      speed: spd,
+    };
+  }
+
+  function updateHUD() {
+    aiScoreEl.textContent = scores.ai;
+    plScoreEl.textContent = scores.player;
+    winsEl.textContent    = wins;
+  }
+
+  function showOverlay(show, title, sub, sc) {
+    overlay.classList.toggle('hidden', !show);
+    if (title !== undefined) titleEl.textContent = title;
+    if (sub   !== undefined) subEl.textContent   = sub;
+    if (sc    !== undefined) { scoreEl.style.display = 'block'; scoreEl.textContent = sc; }
+    else scoreEl.style.display = 'none';
+  }
+
+  function startGame() {
+    initGame();
+    pState = 'running';
+    showOverlay(false);
+    pLastTime = performance.now();
+    pAnimId = requestAnimationFrame(pLoop);
+  }
+
+  function pauseGame() {
+    if (pState === 'running') {
+      pState = 'paused';
+      cancelAnimationFrame(pAnimId);
+      showOverlay(true, '⏸ PAUSED', 'Press Space to resume');
+    } else if (pState === 'paused') {
+      pState = 'running';
+      showOverlay(false);
+      pLastTime = performance.now();
+      pAnimId = requestAnimationFrame(pLoop);
+    }
+  }
+
+  // Controls
+  const keys = {};
+  document.addEventListener('keydown', e => {
+    keys[e.key] = true;
+    if (e.key === ' ') {
+      const panel = document.getElementById('panel-pong');
+      if (!panel.classList.contains('active')) return;
+      e.preventDefault();
+      if (pState === 'idle' || pState === 'over') startGame();
+      else if (pState === 'running' || pState === 'paused') pauseGame();
+    }
+  });
+  document.addEventListener('keyup', e => { keys[e.key] = false; });
+
+  // Mouse control
+  canvas.addEventListener('mousemove', e => {
+    const r = canvas.getBoundingClientRect();
+    const my = (e.clientY - r.top) * (H / r.height);
+    player.y = Math.max(0, Math.min(H - PH, my - PH / 2));
+  });
+
+  // Touch control
+  canvas.addEventListener('touchmove', e => {
+    const r = canvas.getBoundingClientRect();
+    const my = (e.touches[0].clientY - r.top) * (H / r.height);
+    player.y = Math.max(0, Math.min(H - PH, my - PH / 2));
+    e.preventDefault();
+  }, { passive: false });
+
+  canvas.addEventListener('click', () => {
+    if (pState === 'idle' || pState === 'over') startGame();
+    else pauseGame();
+  });
+
+  const PSPD = 5.5;
+
+  function update(dt) {
+    // Player keyboard
+    if (keys['ArrowUp']   || keys['w'] || keys['W']) player.y = Math.max(0, player.y - PSPD);
+    if (keys['ArrowDown'] || keys['s'] || keys['S']) player.y = Math.min(H - PH, player.y + PSPD);
+
+    // AI — tracks ball with speed limit + imperfection
+    const aiCenter = ai.y + PH / 2;
+    const diff = ball.y - aiCenter;
+    ai.y += diff * aiDiff * Math.min(dt / 16, 2.5);
+    ai.y = Math.max(0, Math.min(H - PH, ai.y));
+
+    // Ball trail
+    ballTrail.push({ x: ball.x, y: ball.y });
+    if (ballTrail.length > 10) ballTrail.shift();
+
+    // Move ball
+    ball.x += ball.vx;
+    ball.y += ball.vy;
+
+    // Top/bottom bounce
+    if (ball.y - BALL_R <= 0)     { ball.y = BALL_R;     ball.vy = Math.abs(ball.vy); }
+    if (ball.y + BALL_R >= H)     { ball.y = H - BALL_R; ball.vy = -Math.abs(ball.vy); }
+
+    // Player paddle collision
+    if (
+      ball.vx > 0 &&
+      ball.x + BALL_R >= player.x &&
+      ball.x - BALL_R <= player.x + PW &&
+      ball.y + BALL_R >= player.y &&
+      ball.y - BALL_R <= player.y + PH
+    ) {
+      ball.x = player.x - BALL_R;
+      const hit = (ball.y - (player.y + PH / 2)) / (PH / 2);
+      const angle = hit * Math.PI / 3.5;
+      ball.speed = Math.min(ball.speed + 0.3, 10);
+      ball.vx = -ball.speed * Math.cos(angle);
+      ball.vy =  ball.speed * Math.sin(angle);
+    }
+
+    // AI paddle collision
+    if (
+      ball.vx < 0 &&
+      ball.x - BALL_R <= ai.x + PW &&
+      ball.x + BALL_R >= ai.x &&
+      ball.y + BALL_R >= ai.y &&
+      ball.y - BALL_R <= ai.y + PH
+    ) {
+      ball.x = ai.x + PW + BALL_R;
+      const hit = (ball.y - (ai.y + PH / 2)) / (PH / 2);
+      const angle = hit * Math.PI / 3.5;
+      ball.speed = Math.min(ball.speed + 0.2, 10);
+      ball.vx =  ball.speed * Math.cos(angle);
+      ball.vy =  ball.speed * Math.sin(angle);
+    }
+
+    // Scoring
+    if (ball.x > W + 20) { point('ai');     }
+    else if (ball.x < -20) { point('player'); }
+  }
+
+  function point(who) {
+    scores[who]++;
+    updateHUD();
+    if (scores.player >= WIN_SCORE || scores.ai >= WIN_SCORE) {
+      pState = 'over';
+      cancelAnimationFrame(pAnimId);
+      const won = scores.player >= WIN_SCORE;
+      if (won) wins++;
+      winsEl.textContent = wins;
+      draw();
+      setTimeout(() => {
+        showOverlay(true,
+          won ? '🎉 YOU WIN!' : '🤖 AI WINS',
+          'Press Space or click to play again',
+          `${scores.player} : ${scores.ai}`
+        );
+      }, 400);
+    } else {
+      ball = newBall(who === 'player' ? -1 : 1);
+      ballTrail = [];
+    }
+  }
+
+  function pLoop(now) {
+    if (pState !== 'running') return;
+    const dt = now - pLastTime;
+    pLastTime = now;
+    update(dt);
+    draw();
+    pAnimId = requestAnimationFrame(pLoop);
+  }
+
+  function drawRect(x, y, w, h, color, glow) {
+    ctx.beginPath();
+    ctx.roundRect(x, y, w, h, 4);
+    if (glow) { ctx.shadowBlur = 14; ctx.shadowColor = glow; }
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+  }
+
+  function draw() {
+    ctx.fillStyle = C.bg;
+    ctx.fillRect(0, 0, W, H);
+
+    // Center net
+    ctx.strokeStyle = C.net;
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 8]);
+    ctx.beginPath(); ctx.moveTo(W / 2, 0); ctx.lineTo(W / 2, H); ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Center circle
+    ctx.strokeStyle = C.net;
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(W / 2, H / 2, 40, 0, Math.PI * 2); ctx.stroke();
+
+    // Ball trail
+    ballTrail.forEach((p, i) => {
+      const a = (i / ballTrail.length) * 0.4;
+      const r = BALL_R * (i / ballTrail.length) * 0.7;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(6,214,160,${a})`;
+      ctx.fill();
+    });
+
+    // Ball
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, BALL_R, 0, Math.PI * 2);
+    ctx.shadowBlur = 18; ctx.shadowColor = C.ballGlow;
+    ctx.fillStyle = C.ball;
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    // Paddles
+    drawRect(player.x, player.y, PW, PH, C.player, 'rgba(79,142,247,.7)');
+    drawRect(ai.x, ai.y, PW, PH, C.ai, 'rgba(139,92,246,.7)');
+
+    // Score display on canvas
+    ctx.font = 'bold 36px monospace';
+    ctx.textAlign = 'center';
+    ctx.fillStyle = 'rgba(255,255,255,.12)';
+    ctx.fillText(scores.ai,     W * .27, 50);
+    ctx.fillText(scores.player, W * .73, 50);
+
+    // Labels
+    ctx.font = '11px monospace';
+    ctx.fillStyle = C.muted;
+    ctx.fillText('AI', W * .27, 68);
+    ctx.fillText('YOU', W * .73, 68);
+  }
+
+  // Init idle state
+  pState = 'idle';
+  player = { x: W - PW - 12, y: H / 2 - PH / 2 };
+  ai     = { x: 12, y: H / 2 - PH / 2 };
+  ball   = newBall(1);
+  scores = { player: 0, ai: 0 };
+  wins   = 0;
+  ballTrail = [];
+  draw();
+  showOverlay(true, '🏓 PONG', 'Press Space or click to start');
+
+})();
+
+/* ═══════════════════════════════════════════════
+   SUDOKU
+═══════════════════════════════════════════════ */
+(function() {
+  /* ── Puzzle generator using backtracking ── */
+  function emptyGrid()  { return Array.from({length:81}, () => 0); }
+
+  function isValid(g, idx, val) {
+    const row = Math.floor(idx / 9), col = idx % 9;
+    const boxR = Math.floor(row / 3) * 3, boxC = Math.floor(col / 3) * 3;
+    for (let i = 0; i < 9; i++) {
+      if (g[row * 9 + i] === val) return false;
+      if (g[i * 9 + col] === val) return false;
+      if (g[(boxR + Math.floor(i / 3)) * 9 + boxC + (i % 3)] === val) return false;
+    }
+    return true;
+  }
+
+  function solve(g) {
+    const idx = g.indexOf(0);
+    if (idx === -1) return true;
+    const nums = [1,2,3,4,5,6,7,8,9].sort(() => Math.random() - .5);
+    for (const n of nums) {
+      if (isValid(g, idx, n)) {
+        g[idx] = n;
+        if (solve(g)) return true;
+        g[idx] = 0;
+      }
+    }
+    return false;
+  }
+
+  function generatePuzzle(clues) {
+    const solution = emptyGrid();
+    solve(solution);
+    const puzzle = solution.slice();
+    let toRemove = 81 - clues;
+    const positions = [...Array(81).keys()].sort(() => Math.random() - .5);
+    for (const pos of positions) {
+      if (toRemove === 0) break;
+      puzzle[pos] = 0;
+      toRemove--;
+    }
+    return { puzzle, solution };
+  }
+
+  /* ── Difficulty clue counts ── */
+  const DIFF_CLUES = { easy: 45, medium: 35, hard: 26 };
+
+  /* ── State ── */
+  let grid, solution, given, selected, diff, timerSec, timerInterval, hintsLeft;
+
+  function init(d) {
+    diff = d || diff || 'easy';
+    const { puzzle, solution: sol } = generatePuzzle(DIFF_CLUES[diff]);
+    grid     = puzzle.slice();
+    solution = sol;
+    given    = puzzle.map(v => v !== 0);
+    selected = -1;
+    hintsLeft = 3;
+    clearInterval(timerInterval);
+    timerSec = 0;
+    updateTimer();
+    timerInterval = setInterval(() => { timerSec++; updateTimer(); }, 1000);
+    render();
+    setStatus('Select a cell to begin');
+  }
+
+  function updateTimer() {
+    const m = Math.floor(timerSec / 60), s = timerSec % 60;
+    document.getElementById('sudoku-timer').textContent = m + ':' + String(s).padStart(2,'0');
+  }
+
+  /* ── Render ── */
+  function render() {
+    const board = document.getElementById('sudoku-board');
+    board.innerHTML = '';
+    for (let i = 0; i < 81; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'sudoku-cell';
+      if (given[i])    cell.classList.add('given');
+      if (i === selected) cell.classList.add('selected');
+      if (!given[i] && grid[i] !== 0 && grid[i] !== solution[i]) cell.classList.add('error');
+      cell.textContent = grid[i] || '';
+      cell.addEventListener('click', () => { selected = i; render(); });
+      board.appendChild(cell);
+    }
+  }
+
+  function setStatus(msg) {
+    document.getElementById('sudoku-status').textContent = msg;
+  }
+
+  /* ── Input ── */
+  window.sudokuInput = function(val) {
+    if (selected === -1 || given[selected]) return;
+    grid[selected] = val;
+    render();
+    checkWin();
+  };
+
+  window.sudokuHint = function() {
+    if (hintsLeft <= 0) { setStatus('No hints left!'); return; }
+    const empties = [];
+    for (let i = 0; i < 81; i++) if (!given[i] && grid[i] !== solution[i]) empties.push(i);
+    if (empties.length === 0) { setStatus('Board is already correct!'); return; }
+    const idx = empties[Math.floor(Math.random() * empties.length)];
+    grid[idx] = solution[idx];
+    given[idx] = true; // treat as given so it can't be overwritten
+    hintsLeft--;
+    render();
+    // Flash hint cell
+    const cells = document.querySelectorAll('.sudoku-cell');
+    cells[idx].classList.add('hint');
+    setStatus(`Hint used! ${hintsLeft} remaining.`);
+    checkWin();
+  };
+
+  window.sudokuValidate = function() {
+    let errors = 0;
+    for (let i = 0; i < 81; i++) {
+      if (!given[i] && grid[i] !== 0 && grid[i] !== solution[i]) errors++;
+    }
+    if (errors === 0) setStatus(isComplete() ? '✅ Solved!' : '✅ Everything correct so far!');
+    else setStatus(`❌ ${errors} mistake${errors > 1 ? 's' : ''} found.`);
+  };
+
+  window.sudokuNew = function() { init(diff); };
+
+  window.sudokuSetDiff = function(d) {
+    document.querySelectorAll('.sudoku-difficulty button').forEach(b => {
+      b.classList.toggle('active', b.textContent.toLowerCase() === d);
+    });
+    init(d);
+  };
+
+  function isComplete() {
+    return grid.every((v, i) => v === solution[i]);
+  }
+
+  function checkWin() {
+    if (isComplete()) {
+      clearInterval(timerInterval);
+      const m = Math.floor(timerSec / 60), s = timerSec % 60;
+      setStatus(`🎉 Solved in ${m}:${String(s).padStart(2,'0')}! Excellent!`);
+    }
+  }
+
+  /* ── Keyboard input ── */
+  document.addEventListener('keydown', e => {
+    const panel = document.getElementById('panel-sudoku');
+    if (!panel.classList.contains('active')) return;
+    if (selected === -1) return;
+    // Arrow navigation works on any cell (given or not)
+    const moves = { ArrowUp: -9, ArrowDown: 9, ArrowLeft: -1, ArrowRight: 1 };
+    if (moves[e.key] !== undefined) {
+      const next = selected + moves[e.key];
+      if (next >= 0 && next < 81) { selected = next; render(); }
+      e.preventDefault();
+      return;
+    }
+    // Digit / erase only on non-given cells
+    if (given[selected]) return;
+    if (e.key >= '1' && e.key <= '9') { sudokuInput(parseInt(e.key)); e.preventDefault(); }
+    if (e.key === '0' || e.key === 'Backspace' || e.key === 'Delete') { sudokuInput(0); e.preventDefault(); }
+  });
+
+  /* ── Boot ── */
+  init('easy');
+})();
+</script>
+</body>
+</html>
