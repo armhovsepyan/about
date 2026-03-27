@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C++ Указатели и Ссылки — Пошаговый Гид</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f1117;
+    --surface: #1a1d27;
+    --surface2: #222636;
+    --border: #2e3347;
+    --accent: #7c6af7;
+    --accent2: #4fc3f7;
+    --green: #4caf7d;
+    --red: #f06292;
+    --yellow: #ffd54f;
+    --orange: #ffb74d;
+    --text: #e2e6f0;
+    --muted: #7a8099;
+    --code-bg: #141720;
+  }
+
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.65;
+    padding: 0 0 80px;
+  }
+
+  /* HEADER */
+  header {
+    background: linear-gradient(135deg, #1a1d27 0%, #12141f 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 48px 24px 40px;
+    text-align: center;
+  }
+  header h1 {
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #7c6af7, #4fc3f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 12px;
+  }
+  header p {
+    color: var(--muted);
+    font-size: 1.05rem;
+  }
+
+  /* NAV */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(15, 17, 23, 0.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav::-webkit-scrollbar { display: none; }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+    padding: 14px 14px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  nav a:hover { color: var(--text); border-bottom-color: var(--accent); }
+
+  /* MAIN */
+  main { max-width: 900px; margin: 0 auto; padding: 0 20px; }
+
+  /* SECTION */
+  section {
+    margin-top: 60px;
+    scroll-margin-top: 60px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .step-badge {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent), #5e54e8);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.8rem; font-weight: 700; color: #fff;
+    flex-shrink: 0;
+  }
+  .step-badge.blue { background: linear-gradient(135deg, #4fc3f7, #0288d1); }
+  .step-badge.green { background: linear-gradient(135deg, #4caf7d, #2e7d5e); }
+  .step-badge.orange { background: linear-gradient(135deg, #ffb74d, #e65100); }
+  .step-badge.red { background: linear-gradient(135deg, #f06292, #c2185b); }
+  section h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+  .card p { color: #b8bdd0; margin-bottom: 0; }
+
+  /* CODE BLOCK */
+  pre {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    font-size: 0.9rem;
+    line-height: 1.7;
+    margin: 16px 0;
+  }
+  code { font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; }
+  .kw { color: #c792ea; }
+  .ty { color: #82aaff; }
+  .cm { color: #546e7a; font-style: italic; }
+  .num { color: #f78c6c; }
+  .fn { color: #82aaff; }
+  .op { color: #89ddff; }
+  .str { color: #c3e88d; }
+
+  /* MEMORY DIAGRAM */
+  .mem-diagram {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: flex-start;
+    margin: 20px 0;
+  }
+  .mem-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    min-width: 150px;
+    text-align: center;
+  }
+  .mem-box .var-name {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+    font-family: monospace;
+  }
+  .mem-box .var-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    font-family: monospace;
+    margin: 6px 0;
+  }
+  .mem-box .var-addr {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-family: monospace;
+    background: var(--code-bg);
+    border-radius: 4px;
+    padding: 2px 6px;
+    display: inline-block;
+    margin-top: 4px;
+  }
+  .mem-box.highlight { border-color: var(--accent); }
+  .mem-box.highlight .var-value { color: var(--accent); }
+  .mem-box.green-hl { border-color: var(--green); }
+  .mem-box.green-hl .var-value { color: var(--green); }
+  .mem-box.red-hl { border-color: var(--red); }
+  .mem-box.red-hl .var-value { color: var(--red); }
+  .mem-box.yellow-hl { border-color: var(--yellow); }
+  .mem-box.yellow-hl .var-value { color: var(--yellow); }
+
+  .arrow {
+    display: flex;
+    align-items: center;
+    color: var(--muted);
+    font-size: 1.4rem;
+    padding-top: 28px;
+  }
+
+  /* LEGEND */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.83rem;
+    color: var(--muted);
+  }
+  .dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot.purple { background: var(--accent); }
+  .dot.blue { background: var(--accent2); }
+  .dot.green { background: var(--green); }
+  .dot.red { background: var(--red); }
+  .dot.yellow { background: var(--yellow); }
+
+  /* CALLOUT */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: rgba(124, 106, 247, 0.08);
+    border-radius: 0 8px 8px 0;
+    padding: 14px 18px;
+    font-size: 0.92rem;
+    margin: 16px 0;
+    color: #c5c0f5;
+  }
+  .callout.green-cl {
+    border-left-color: var(--green);
+    background: rgba(76, 175, 125, 0.08);
+    color: #a8d5c0;
+  }
+  .callout.red-cl {
+    border-left-color: var(--red);
+    background: rgba(240, 98, 146, 0.08);
+    color: #f5b8ce;
+  }
+  .callout.yellow-cl {
+    border-left-color: var(--yellow);
+    background: rgba(255, 213, 79, 0.06);
+    color: #f5e8b0;
+  }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; margin: 20px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    min-width: 580px;
+  }
+  th {
+    background: var(--surface2);
+    color: var(--text);
+    font-weight: 600;
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(46, 51, 71, 0.6);
+    color: #b8bdd0;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(255,255,255,0.02); }
+  td code {
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: 0.83rem;
+  }
+  .check { color: var(--green); font-weight: 700; }
+  .cross { color: var(--red); font-weight: 700; }
+
+  /* GRID */
+  .grid2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin: 16px 0;
+  }
+  @media (max-width: 600px) {
+    .grid2 { grid-template-columns: 1fr; }
+    .mem-diagram { gap: 12px; }
+  }
+
+  .tag {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 5px;
+    margin-right: 6px;
+  }
+  .tag.ok { background: rgba(76,175,125,0.15); color: var(--green); }
+  .tag.no { background: rgba(240,98,146,0.15); color: var(--red); }
+
+  /* ИТОГ */
+  .итог {
+    background: linear-gradient(135deg, rgba(124,106,247,0.12), rgba(79,195,247,0.08));
+    border: 1px solid rgba(124,106,247,0.25);
+    border-radius: 12px;
+    padding: 18px 22px;
+    margin-top: 18px;
+    font-size: 0.92rem;
+  }
+  .итог strong { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>C++ Указатели и Ссылки</h1>
+  <p>Пошаговый визуальный гид на русском языке &mdash; *, &amp;, **, *&amp;, const</p>
+</header>
+
+<nav>
+  <a href="#s1">Шаг 1: Переменная</a>
+  <a href="#s2">Шаг 2: * Указатель</a>
+  <a href="#s3">Шаг 3: Разыменование</a>
+  <a href="#s4">Шаг 4: &amp; Ссылка</a>
+  <a href="#s5">Шаг 5: ** Двойной</a>
+  <a href="#s6">Шаг 6: *&amp; Ссылка на указатель</a>
+  <a href="#s7">Функции</a>
+  <a href="#s8">const</a>
+  <a href="#s9">Шпаргалка</a>
+</nav>
+
+<main>
+
+<!-- ======================== STEP 1 ======================== -->
+<section id="s1">
+  <div class="section-header">
+    <div class="step-badge">1</div>
+    <h2>Переменная и память</h2>
+  </div>
+
+  <div class="card">
+    <p>Когда вы создаёте переменную, компьютер выделяет ей <strong>место в памяти</strong> — ячейку с адресом.</p>
+  </div>
+
+<pre><code><span class="kw">int</span> x <span class="op">=</span> <span class="num">42</span><span class="op">;</span>
+<span class="cm">// x — имя ячейки</span>
+<span class="cm">// 42 — значение в ней</span>
+<span class="cm">// &amp;x == 0x7ffd1234 — адрес ячейки</span></code></pre>
+
+  <div class="mem-diagram">
+    <div class="mem-box highlight">
+      <div class="var-name">x</div>
+      <div class="var-value" style="color:#7c6af7">42</div>
+      <div class="var-addr">0x7ffd1234</div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><div class="dot purple"></div>имя переменной</div>
+    <div class="legend-item"><div class="dot blue"></div>значение</div>
+    <div class="legend-item"><div class="dot green"></div>адрес в памяти</div>
+  </div>
+
+  <div class="итог"><strong>Итог:</strong> переменная <code>x</code> — это имя ячейки памяти. В ней хранится значение <code>42</code>, и у неё есть адрес.</div>
+</section>
+
+<!-- ======================== STEP 2 ======================== -->
+<section id="s2">
+  <div class="section-header">
+    <div class="step-badge blue">2</div>
+    <h2>* — Звёздочка (Указатель)</h2>
+  </div>
+
+  <div class="card">
+    <p><code>*</code> в <strong>объявлении</strong> означает «это указатель» — переменная, которая хранит не значение, а <strong>адрес</strong> другой переменной.</p>
+  </div>
+
+<pre><code><span class="kw">int</span>  x <span class="op">=</span> <span class="num">42</span><span class="op">;</span>
+<span class="kw">int</span><span class="op">*</span> p <span class="op">=</span> <span class="op">&amp;</span>x<span class="op">;</span>    <span class="cm">// p хранит АДРЕС переменной x</span>
+                 <span class="cm">// &amp;x — «взять адрес» x</span></code></pre>
+
+  <div class="mem-diagram">
+    <div class="mem-box highlight">
+      <div class="var-name">x</div>
+      <div class="var-value" style="color:#7c6af7">42</div>
+      <div class="var-addr">0x7ffd1234</div>
+    </div>
+    <div class="arrow">←</div>
+    <div class="mem-box green-hl">
+      <div class="var-name">p</div>
+      <div class="var-value" style="color:#4caf7d; font-size:1rem">0x7ffd1234</div>
+      <div class="var-addr">0x7ffd5678</div>
+    </div>
+  </div>
+
+  <div class="callout green-cl">
+    <code>p</code> — отдельная переменная, у которой <em>свой</em> адрес (<code>0x7ffd5678</code>).<br>
+    Но внутри неё лежит адрес <code>x</code> — то есть <code>p</code> «смотрит» на <code>x</code>.
+  </div>
+
+  <div class="итог"><strong>Итог:</strong> <code>int* p</code> — переменная p хранит адрес. <code>&amp;x</code> — взять адрес переменной x. Теперь p знает, где живёт x.</div>
+</section>
+
+<!-- ======================== STEP 3 ======================== -->
+<section id="s3">
+  <div class="section-header">
+    <div class="step-badge green">3</div>
+    <h2>* в выражении — Разыменование</h2>
+  </div>
+
+  <div class="card">
+    <p>Когда <code>*</code> стоит перед указателем в <strong>выражении</strong> — это значит «иди по адресу и возьми значение».</p>
+  </div>
+
+<pre><code><span class="kw">int</span>  x  <span class="op">=</span> <span class="num">42</span><span class="op">;</span>
+<span class="kw">int</span><span class="op">*</span> p  <span class="op">=</span> <span class="op">&amp;</span>x<span class="op">;</span>
+
+<span class="kw">int</span>  v  <span class="op">=</span> <span class="op">*</span>p<span class="op">;</span>    <span class="cm">// *p == 42  (прочитать значение)</span>
+<span class="op">*</span>p <span class="op">=</span> <span class="num">100</span><span class="op">;</span>        <span class="cm">// x теперь == 100 (записать через указатель)</span></code></pre>
+
+  <div class="mem-diagram">
+    <div class="mem-box highlight" style="border-color:#ffd54f">
+      <div class="var-name">x</div>
+      <div class="var-value" style="color:#ffd54f">100</div>
+      <div class="var-addr">0x7ffd1234</div>
+    </div>
+    <div class="arrow">←</div>
+    <div class="mem-box green-hl">
+      <div class="var-name">p</div>
+      <div class="var-value" style="color:#4caf7d; font-size:1rem">0x7ffd1234</div>
+      <div class="var-addr">0x7ffd5678</div>
+    </div>
+  </div>
+
+  <div class="callout yellow-cl">
+    <strong>*p = 100</strong> — мы не меняем сам p (он всё ещё смотрит на x). Мы меняем то, что <em>по адресу</em>, куда он смотрит.
+  </div>
+
+  <div class="итог"><strong>Итог:</strong> <code>*p</code> в выражении — «зайти в ячейку, на которую указывает p». <code>*p = 100</code> меняет <code>x</code> через указатель.</div>
+</section>
+
+<!-- ======================== STEP 4 ======================== -->
+<section id="s4">
+  <div class="section-header">
+    <div class="step-badge orange">4</div>
+    <h2>&amp; — Ссылка</h2>
+  </div>
+
+  <div class="card">
+    <p>Ссылка — это <strong>псевдоним</strong> (второе имя) для той же переменной. Это НЕ новая ячейка памяти.</p>
+  </div>
+
+<pre><code><span class="kw">int</span>  x <span class="op">=</span> <span class="num">42</span><span class="op">;</span>
+<span class="kw">int</span><span class="op">&amp;</span> r <span class="op">=</span> x<span class="op">;</span>       <span class="cm">// r — псевдоним x, тот же адрес!</span>
+
+r <span class="op">=</span> <span class="num">99</span><span class="op">;</span>           <span class="cm">// x тоже стал 99</span>
+<span class="cm">// &amp;r == &amp;x  — одинаковый адрес</span></code></pre>
+
+  <div class="mem-diagram">
+    <div class="mem-box" style="border-color: #ffb74d; position:relative; text-align:center;">
+      <div style="font-size:0.75rem; color:var(--muted); margin-bottom:6px">x / r — одна ячейка</div>
+      <div style="font-size:1.6rem; font-weight:700; color:#ffb74d; font-family:monospace">99</div>
+      <div class="var-addr">0x7ffd1234</div>
+    </div>
+  </div>
+
+  <div class="callout" style="border-color:#ffb74d; background:rgba(255,183,77,0.07); color:#f5d8a8">
+    Ссылка всегда инициализируется и <strong>не может быть переназначена</strong> на другой объект — это её отличие от указателя.
+  </div>
+
+  <div class="итог"><strong>Итог:</strong> <code>int&amp; r = x</code> — r и x это одна и та же ячейка памяти. Изменил r — изменился x, и наоборот.</div>
+</section>
+
+<!-- ======================== STEP 5 ======================== -->
+<section id="s5">
+  <div class="section-header">
+    <div class="step-badge red">5</div>
+    <h2>** — Указатель на указатель</h2>
+  </div>
+
+  <div class="card">
+    <p><code>**</code> — это указатель, который хранит адрес другого указателя (двойная косвенность).</p>
+  </div>
+
+<pre><code><span class="kw">int</span>   x  <span class="op">=</span> <span class="num">42</span><span class="op">;</span>
+<span class="kw">int</span><span class="op">*</span>  p  <span class="op">=</span> <span class="op">&amp;</span>x<span class="op">;</span>    <span class="cm">// p  → x</span>
+<span class="kw">int</span><span class="op">**</span> pp <span class="op">=</span> <span class="op">&amp;</span>p<span class="op">;</span>    <span class="cm">// pp → p → x</span>
+
+<span class="op">**</span>pp <span class="op">==</span> <span class="num">42</span>        <span class="cm">// два перехода: pp→p, затем p→x</span>
+<span class="op">*</span>pp  <span class="op">==</span> p         <span class="cm">// один переход: pp→p</span></code></pre>
+
+  <div class="mem-diagram">
+    <div class="mem-box highlight">
+      <div class="var-name">x</div>
+      <div class="var-value" style="color:#7c6af7">42</div>
+      <div class="var-addr">0x1234</div>
+    </div>
+    <div class="arrow">←</div>
+    <div class="mem-box green-hl">
+      <div class="var-name">p</div>
+      <div class="var-value" style="color:#4caf7d; font-size:1rem">0x1234</div>
+      <div class="var-addr">0x5678</div>
+    </div>
+    <div class="arrow">←</div>
+    <div class="mem-box red-hl">
+      <div class="var-name">pp</div>
+      <div class="var-value" style="color:#f06292; font-size:1rem">0x5678</div>
+      <div class="var-addr">0x9abc</div>
+    </div>
+  </div>
+
+  <div class="callout red-cl">
+    Применяется в C-стиле для динамических массивов строк (<code>char**</code>), двумерных массивов, и функций, которым нужно изменить указатель снаружи.
+  </div>
+
+  <div class="итог"><strong>Итог:</strong> pp → хранит адрес p. p → хранит адрес x. <code>**pp</code> — это и есть 42. Цепочка из двух переходов.</div>
+</section>
+
+<!-- ======================== STEP 6 ======================== -->
+<section id="s6">
+  <div class="section-header">
+    <div class="step-badge" style="background:linear-gradient(135deg,#4fc3f7,#0288d1)">6</div>
+    <h2>*&amp; — Ссылка на указатель</h2>
+  </div>
+
+  <div class="card">
+    <p><code>int*&amp; rp = p</code> — это ссылка на указатель. Позволяет изменить <strong>сам указатель</strong> p внутри функции.</p>
+  </div>
+
+<pre><code><span class="kw">void</span> <span class="fn">changePtr</span>(<span class="kw">int</span><span class="op">*&amp;</span> rp) {
+    rp <span class="op">=</span> <span class="kw">nullptr</span><span class="op">;</span>   <span class="cm">// меняем сам указатель снаружи!</span>
+}
+
+<span class="kw">int</span>  x <span class="op">=</span> <span class="num">42</span><span class="op">;</span>
+<span class="kw">int</span><span class="op">*</span> p <span class="op">=</span> <span class="op">&amp;</span>x<span class="op">;</span>
+changePtr(p)<span class="op">;</span>
+<span class="cm">// теперь p == nullptr</span></code></pre>
+
+  <div class="mem-diagram">
+    <div class="mem-box highlight">
+      <div class="var-name">x</div>
+      <div class="var-value" style="color:#7c6af7">42</div>
+      <div class="var-addr">0x1234</div>
+    </div>
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; padding-top:16px">
+      <div style="font-size:0.75rem; color:var(--muted)">p / rp</div>
+      <div style="font-size:1.5rem; color:var(--muted)">⇄</div>
+      <div style="font-size:0.7rem; color:var(--muted)">один и тот же</div>
+    </div>
+    <div class="mem-box green-hl">
+      <div class="var-name">p (и rp — псевдоним)</div>
+      <div class="var-value" style="color:#4caf7d; font-size:1rem">0x1234</div>
+      <div class="var-addr">0x5678</div>
+    </div>
+  </div>
+
+  <div class="callout">
+    Читайте справа налево: <code>int*&amp; rp</code> → «rp — это <strong>ссылка (&amp;)</strong> на <strong>указатель (*)</strong> на <strong>int</strong>»
+  </div>
+
+  <div class="callout red-cl" style="margin-top:8px">
+    <strong>int&amp;*</strong> — невалидный синтаксис! Нельзя сделать указатель на ссылку. Ссылка не самостоятельный объект — у неё нет своего адреса для указателя.
+  </div>
+
+  <div class="итог"><strong>Итог:</strong> <code>int*&amp; rp = p</code> — rp это псевдоним самой переменной p. Изменяя rp, мы меняем куда смотрит p.</div>
+</section>
+
+<!-- ======================== FUNCTIONS ======================== -->
+<section id="s7">
+  <div class="section-header">
+    <div class="step-badge" style="background:linear-gradient(135deg,#4caf7d,#2e7d5e)">f()</div>
+    <h2>Поведение в параметрах функций</h2>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <div style="font-size:0.8rem; color:var(--muted); margin-bottom:8px">Случай 1</div>
+      <pre style="margin:0"><code><span class="kw">void</span> <span class="fn">f</span>(<span class="kw">int</span> a)</code></pre>
+      <p style="margin-top:12px">Передача <strong>по значению</strong>. Получает копию. Оригинал <em>не меняется</em>.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:0.8rem; color:var(--muted); margin-bottom:8px">Случай 2</div>
+      <pre style="margin:0"><code><span class="kw">void</span> <span class="fn">f</span>(<span class="kw">int</span><span class="op">*</span> a)</code></pre>
+      <p style="margin-top:12px">Передача <strong>указателя</strong>. Может менять <code>*a</code>, но не сам указатель снаружи.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:0.8rem; color:var(--muted); margin-bottom:8px">Случай 3</div>
+      <pre style="margin:0"><code><span class="kw">void</span> <span class="fn">f</span>(<span class="kw">int</span><span class="op">&amp;</span> a)</code></pre>
+      <p style="margin-top:12px">Передача <strong>по ссылке</strong>. Псевдоним оригинала. Удобнее и безопаснее указателя.</p>
+    </div>
+    <div class="card">
+      <div style="font-size:0.8rem; color:var(--muted); margin-bottom:8px">Случай 4</div>
+      <pre style="margin:0"><code><span class="kw">void</span> <span class="fn">f</span>(<span class="kw">int</span><span class="op">*&amp;</span> a)</code></pre>
+      <p style="margin-top:12px"><strong>Ссылка на указатель</strong>. Может изменить сам указатель снаружи — переключить на другой объект.</p>
+    </div>
+  </div>
+
+<pre><code><span class="cm">// Демо всех четырёх случаев:</span>
+<span class="kw">int</span>  x <span class="op">=</span> <span class="num">10</span><span class="op">;</span>
+<span class="kw">int</span>  y <span class="op">=</span> <span class="num">20</span><span class="op">;</span>
+<span class="kw">int</span><span class="op">*</span> p <span class="op">=</span> <span class="op">&amp;</span>x<span class="op">;</span>
+
+<span class="kw">void</span> <span class="fn">byVal</span>(<span class="kw">int</span> a)    { a <span class="op">=</span> <span class="num">99</span><span class="op">;</span> }       <span class="cm">// x не изменился</span>
+<span class="kw">void</span> <span class="fn">byPtr</span>(<span class="kw">int</span><span class="op">*</span> a)   { <span class="op">*</span>a <span class="op">=</span> <span class="num">99</span><span class="op">;</span> }      <span class="cm">// x == 99 теперь</span>
+<span class="kw">void</span> <span class="fn">byRef</span>(<span class="kw">int</span><span class="op">&amp;</span> a)   { a <span class="op">=</span> <span class="num">99</span><span class="op">;</span> }       <span class="cm">// x == 99 теперь</span>
+<span class="kw">void</span> <span class="fn">byPRef</span>(<span class="kw">int</span><span class="op">*&amp;</span> a) { a <span class="op">=</span> <span class="op">&amp;</span>y<span class="op">;</span> }      <span class="cm">// p теперь смотрит на y!</span></code></pre>
+
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Синтаксис</th>
+        <th>Меняет *a?</th>
+        <th>Меняет a (указатель)?</th>
+        <th>Нужен &amp; при вызове?</th>
+      </tr>
+      <tr>
+        <td><code>int a</code></td>
+        <td>не применимо</td>
+        <td class="cross">✗</td>
+        <td class="cross">✗</td>
+      </tr>
+      <tr>
+        <td><code>int* a</code></td>
+        <td class="check">✓</td>
+        <td class="cross">✗</td>
+        <td>нет (передаётся указатель)</td>
+      </tr>
+      <tr>
+        <td><code>int&amp; a</code></td>
+        <td class="check">✓</td>
+        <td>нет (ссылка)</td>
+        <td class="cross">✗</td>
+      </tr>
+      <tr>
+        <td><code>int*&amp; a</code></td>
+        <td class="check">✓</td>
+        <td class="check">✓</td>
+        <td>нет (передаётся указатель)</td>
+      </tr>
+    </table>
+  </div>
+</section>
+
+<!-- ======================== CONST ======================== -->
+<section id="s8">
+  <div class="section-header">
+    <div class="step-badge" style="background:linear-gradient(135deg,#ffb74d,#e65100)">C</div>
+    <h2>const — Защита данных</h2>
+  </div>
+
+  <div class="card">
+    <p><strong>const</strong> защищает то, что стоит <em>справа</em> от него. Читайте объявление <strong>справа налево</strong> — всё встаёт на место.</p>
+  </div>
+
+  <h3 style="margin: 24px 0 14px; font-size:1.05rem; color:#b8bdd0">Простые случаи</h3>
+
+<pre><code><span class="kw">const int</span>  x <span class="op">=</span> <span class="num">42</span><span class="op">;</span>   <span class="cm">// x нельзя изменить</span>
+<span class="kw">int const</span>  y <span class="op">=</span> <span class="num">42</span><span class="op">;</span>   <span class="cm">// то же самое</span></code></pre>
+
+  <h3 style="margin: 24px 0 14px; font-size:1.05rem; color:#b8bdd0">const + указатель — самая путаная часть</h3>
+
+<pre><code><span class="cm">// Читаем справа налево:</span>
+
+<span class="kw">const int</span><span class="op">*</span> p1<span class="op">;</span>
+<span class="cm">// p1 — указатель на const int</span>
+<span class="cm">// нельзя менять *p1, но можно p1 = &amp;другой_переменной</span>
+
+<span class="kw">int</span><span class="op">*</span> <span class="kw">const</span> p2 <span class="op">=</span> <span class="op">&amp;</span>x<span class="op">;</span>
+<span class="cm">// p2 — const указатель на int</span>
+<span class="cm">// нельзя менять p2 (куда смотрит), но *p2 = 5 — можно</span>
+
+<span class="kw">const int</span><span class="op">*</span> <span class="kw">const</span> p3 <span class="op">=</span> <span class="op">&amp;</span>x<span class="op">;</span>
+<span class="cm">// p3 — const указатель на const int</span>
+<span class="cm">// нельзя ни *p3 менять, ни сам p3</span></code></pre>
+
+  <div class="mem-diagram">
+    <div class="mem-box" style="border-color:#f06292">
+      <div class="var-name">const int* p</div>
+      <div style="font-size:0.8rem; color:#f06292; margin:8px 0">❌ *p = x</div>
+      <div style="font-size:0.8rem; color:#4caf7d">✅ p = &amp;y</div>
+    </div>
+    <div class="mem-box" style="border-color:#ffb74d">
+      <div class="var-name">int* const p</div>
+      <div style="font-size:0.8rem; color:#4caf7d; margin:8px 0">✅ *p = x</div>
+      <div style="font-size:0.8rem; color:#f06292">❌ p = &amp;y</div>
+    </div>
+    <div class="mem-box" style="border-color:#7c6af7">
+      <div class="var-name">const int* const p</div>
+      <div style="font-size:0.8rem; color:#f06292; margin:8px 0">❌ *p = x</div>
+      <div style="font-size:0.8rem; color:#f06292">❌ p = &amp;y</div>
+    </div>
+  </div>
+
+  <h3 style="margin: 24px 0 14px; font-size:1.05rem; color:#b8bdd0">const в параметрах функций — самое важное на практике</h3>
+
+<pre><code><span class="kw">void</span> <span class="fn">print</span>(<span class="kw">const int</span><span class="op">&amp;</span> val)  <span class="cm">// читаем: val — ссылка на const int</span>
+{
+    <span class="cm">// val = 5;  — ошибка компиляции!</span>
+    <span class="cm">// Гарантируем вызывающему: мы не изменим его данные.</span>
+}
+<span class="cm">// Это самый частый паттерн C++ для больших объектов:</span>
+<span class="cm">// передаём без копирования + гарантируем неизменность.</span>
+
+<span class="kw">void</span> <span class="fn">process</span>(<span class="kw">const int</span><span class="op">*</span> p)  <span class="cm">// указатель на const int</span>
+{
+    <span class="cm">// *p = 5;  — ошибка!</span>
+    <span class="cm">// p = &amp;x;  — можно (сам указатель не защищён)</span>
+}</code></pre>
+
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Объявление</th>
+        <th>Читается как</th>
+        <th>*p менять?</th>
+        <th>p менять?</th>
+      </tr>
+      <tr><td><code>int* p</code></td><td>указатель на int</td><td class="check">✓</td><td class="check">✓</td></tr>
+      <tr><td><code>const int* p</code></td><td>указатель на const int</td><td class="cross">✗</td><td class="check">✓</td></tr>
+      <tr><td><code>int* const p</code></td><td>const-указатель на int</td><td class="check">✓</td><td class="cross">✗</td></tr>
+      <tr><td><code>const int* const p</code></td><td>const-указатель на const int</td><td class="cross">✗</td><td class="cross">✗</td></tr>
+      <tr><td><code>const int&amp; r</code></td><td>ссылка на const int</td><td class="cross">✗</td><td>н/п</td></tr>
+      <tr><td><code>int&amp; const r</code></td><td>бессмысленно — ошибка!</td><td>–</td><td>–</td></tr>
+    </table>
+  </div>
+
+  <div class="callout" style="margin-top:20px">
+    <strong>Три главных правила:</strong><br>
+    1. <code>const</code> защищает то, что стоит <em>справа</em> от него.<br>
+    2. <code>const int&amp;</code> — самый частый паттерн C++: передать без копирования, запретить изменение.<br>
+    3. <code>int&amp; const</code> — бессмысленно и выдаст ошибку. Ссылка и так не переназначается.
+  </div>
+</section>
+
+<!-- ======================== CHEATSHEET ======================== -->
+<section id="s9">
+  <div class="section-header">
+    <div class="step-badge" style="background:linear-gradient(135deg,#f06292,#c2185b)">★</div>
+    <h2>Итоговая шпаргалка</h2>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <tr>
+        <th>Синтаксис</th>
+        <th>Название</th>
+        <th>Что хранит</th>
+        <th>Типичное применение</th>
+      </tr>
+      <tr>
+        <td><code>int x</code></td>
+        <td>Переменная</td>
+        <td>Значение</td>
+        <td>Обычные данные</td>
+      </tr>
+      <tr>
+        <td><code>int* p</code></td>
+        <td>Указатель</td>
+        <td>Адрес переменной</td>
+        <td>Динамическая память, массивы</td>
+      </tr>
+      <tr>
+        <td><code>&amp;x</code></td>
+        <td>Взять адрес</td>
+        <td>—</td>
+        <td>Получить адрес переменной</td>
+      </tr>
+      <tr>
+        <td><code>*p</code></td>
+        <td>Разыменование</td>
+        <td>—</td>
+        <td>Прочитать/записать по адресу</td>
+      </tr>
+      <tr>
+        <td><code>int&amp; r</code></td>
+        <td>Ссылка</td>
+        <td>Псевдоним</td>
+        <td>Параметры функций, range-for</td>
+      </tr>
+      <tr>
+        <td><code>int** pp</code></td>
+        <td>Указатель на указатель</td>
+        <td>Адрес указателя</td>
+        <td>Массивы строк (<code>char**</code>), argv</td>
+      </tr>
+      <tr>
+        <td><code>int*&amp; rp</code></td>
+        <td>Ссылка на указатель</td>
+        <td>Псевдоним указателя</td>
+        <td>Изменить указатель внутри функции</td>
+      </tr>
+      <tr>
+        <td><code>const int&amp;</code></td>
+        <td>Константная ссылка</td>
+        <td>—</td>
+        <td>Эффективная передача в функцию</td>
+      </tr>
+    </table>
+  </div>
+
+  <div class="callout" style="margin-top:24px; font-size:1rem">
+    <strong>Главная подсказка для чтения:</strong> читайте объявление <strong>справа налево</strong>.<br><br>
+    Пример: <code>int*&amp; rp</code> — читаем:<br>
+    <em>«rp — это ссылка (&amp;) на указатель (*) на int»</em><br><br>
+    Пример: <code>const int* const p</code> — читаем:<br>
+    <em>«p — это const-указатель (*) на const-int»</em>
+  </div>
+
+  <div style="margin-top:32px; padding:24px; background:var(--surface2); border-radius:12px; border:1px solid var(--border)">
+    <div style="font-size:0.8rem; color:var(--muted); margin-bottom:16px; text-transform:uppercase; letter-spacing:1px">Быстрая справка — формула памяти</div>
+    <div style="display:flex; flex-wrap:wrap; gap:10px">
+      <div style="background:rgba(124,106,247,0.12); border:1px solid rgba(124,106,247,0.3); border-radius:8px; padding:10px 14px; font-family:monospace; font-size:0.9rem">
+        <span style="color:#7c6af7">int*</span> → указатель
+      </div>
+      <div style="background:rgba(79,195,247,0.1); border:1px solid rgba(79,195,247,0.25); border-radius:8px; padding:10px 14px; font-family:monospace; font-size:0.9rem">
+        <span style="color:#4fc3f7">int&amp;</span> → ссылка
+      </div>
+      <div style="background:rgba(240,98,146,0.1); border:1px solid rgba(240,98,146,0.25); border-radius:8px; padding:10px 14px; font-family:monospace; font-size:0.9rem">
+        <span style="color:#f06292">int**</span> → указатель на указатель
+      </div>
+      <div style="background:rgba(76,175,125,0.1); border:1px solid rgba(76,175,125,0.25); border-radius:8px; padding:10px 14px; font-family:monospace; font-size:0.9rem">
+        <span style="color:#4caf7d">int*&amp;</span> → ссылка на указатель
+      </div>
+      <div style="background:rgba(255,183,77,0.08); border:1px solid rgba(255,183,77,0.25); border-radius:8px; padding:10px 14px; font-family:monospace; font-size:0.9rem">
+        <span style="color:#ffd54f">const int*</span> → указатель на const
+      </div>
+      <div style="background:rgba(255,87,34,0.08); border:1px solid rgba(255,87,34,0.2); border-radius:8px; padding:10px 14px; font-family:monospace; font-size:0.9rem">
+        <span style="color:#ff8a65">int* const</span> → const указатель
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+</body>
+</html>
