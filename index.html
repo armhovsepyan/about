@@ -4,323 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>C++ Указатели и Ссылки — Пошаговый Гид</title>
-<style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #0f1117;
-    --surface: #1a1d27;
-    --surface2: #222636;
-    --border: #2e3347;
-    --accent: #7c6af7;
-    --accent2: #4fc3f7;
-    --green: #4caf7d;
-    --red: #f06292;
-    --yellow: #ffd54f;
-    --orange: #ffb74d;
-    --text: #e2e6f0;
-    --muted: #7a8099;
-    --code-bg: #141720;
-  }
-
-  body {
-    font-family: 'Segoe UI', system-ui, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.65;
-    padding: 0 0 80px;
-  }
-
-  /* HEADER */
-  header {
-    background: linear-gradient(135deg, #1a1d27 0%, #12141f 100%);
-    border-bottom: 1px solid var(--border);
-    padding: 48px 24px 40px;
-    text-align: center;
-  }
-  header h1 {
-    font-size: clamp(1.8rem, 4vw, 2.8rem);
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    background: linear-gradient(135deg, #7c6af7, #4fc3f7);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 12px;
-  }
-  header p {
-    color: var(--muted);
-    font-size: 1.05rem;
-  }
-
-  /* NAV */
-  nav {
-    position: sticky;
-    top: 0;
-    z-index: 100;
-    background: rgba(15, 17, 23, 0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: 0 24px;
-    display: flex;
-    gap: 4px;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  nav::-webkit-scrollbar { display: none; }
-  nav a {
-    color: var(--muted);
-    text-decoration: none;
-    padding: 14px 14px;
-    font-size: 0.85rem;
-    white-space: nowrap;
-    border-bottom: 2px solid transparent;
-    transition: all 0.2s;
-  }
-  nav a:hover { color: var(--text); border-bottom-color: var(--accent); }
-
-  /* MAIN */
-  main { max-width: 900px; margin: 0 auto; padding: 0 20px; }
-
-  /* SECTION */
-  section {
-    margin-top: 60px;
-    scroll-margin-top: 60px;
-  }
-  .section-header {
-    display: flex;
-    align-items: center;
-    gap: 14px;
-    margin-bottom: 28px;
-  }
-  .step-badge {
-    width: 36px; height: 36px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, var(--accent), #5e54e8);
-    display: flex; align-items: center; justify-content: center;
-    font-size: 0.8rem; font-weight: 700; color: #fff;
-    flex-shrink: 0;
-  }
-  .step-badge.blue { background: linear-gradient(135deg, #4fc3f7, #0288d1); }
-  .step-badge.green { background: linear-gradient(135deg, #4caf7d, #2e7d5e); }
-  .step-badge.orange { background: linear-gradient(135deg, #ffb74d, #e65100); }
-  .step-badge.red { background: linear-gradient(135deg, #f06292, #c2185b); }
-  section h2 {
-    font-size: 1.35rem;
-    font-weight: 600;
-  }
-
-  /* CARD */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 24px;
-    margin-bottom: 16px;
-  }
-  .card p { color: #b8bdd0; margin-bottom: 0; }
-
-  /* CODE BLOCK */
-  pre {
-    background: var(--code-bg);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 18px 20px;
-    overflow-x: auto;
-    font-size: 0.9rem;
-    line-height: 1.7;
-    margin: 16px 0;
-  }
-  code { font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace; }
-  .kw { color: #c792ea; }
-  .ty { color: #82aaff; }
-  .cm { color: #546e7a; font-style: italic; }
-  .num { color: #f78c6c; }
-  .fn { color: #82aaff; }
-  .op { color: #89ddff; }
-  .str { color: #c3e88d; }
-
-  /* MEMORY DIAGRAM */
-  .mem-diagram {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    align-items: flex-start;
-    margin: 20px 0;
-  }
-  .mem-box {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 20px;
-    min-width: 150px;
-    text-align: center;
-  }
-  .mem-box .var-name {
-    font-size: 0.78rem;
-    color: var(--muted);
-    margin-bottom: 4px;
-    font-family: monospace;
-  }
-  .mem-box .var-value {
-    font-size: 1.6rem;
-    font-weight: 700;
-    font-family: monospace;
-    margin: 6px 0;
-  }
-  .mem-box .var-addr {
-    font-size: 0.72rem;
-    color: var(--muted);
-    font-family: monospace;
-    background: var(--code-bg);
-    border-radius: 4px;
-    padding: 2px 6px;
-    display: inline-block;
-    margin-top: 4px;
-  }
-  .mem-box.highlight { border-color: var(--accent); }
-  .mem-box.highlight .var-value { color: var(--accent); }
-  .mem-box.green-hl { border-color: var(--green); }
-  .mem-box.green-hl .var-value { color: var(--green); }
-  .mem-box.red-hl { border-color: var(--red); }
-  .mem-box.red-hl .var-value { color: var(--red); }
-  .mem-box.yellow-hl { border-color: var(--yellow); }
-  .mem-box.yellow-hl .var-value { color: var(--yellow); }
-
-  .arrow {
-    display: flex;
-    align-items: center;
-    color: var(--muted);
-    font-size: 1.4rem;
-    padding-top: 28px;
-  }
-
-  /* LEGEND */
-  .legend {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    margin-top: 14px;
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 0.83rem;
-    color: var(--muted);
-  }
-  .dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .dot.purple { background: var(--accent); }
-  .dot.blue { background: var(--accent2); }
-  .dot.green { background: var(--green); }
-  .dot.red { background: var(--red); }
-  .dot.yellow { background: var(--yellow); }
-
-  /* CALLOUT */
-  .callout {
-    border-left: 3px solid var(--accent);
-    background: rgba(124, 106, 247, 0.08);
-    border-radius: 0 8px 8px 0;
-    padding: 14px 18px;
-    font-size: 0.92rem;
-    margin: 16px 0;
-    color: #c5c0f5;
-  }
-  .callout.green-cl {
-    border-left-color: var(--green);
-    background: rgba(76, 175, 125, 0.08);
-    color: #a8d5c0;
-  }
-  .callout.red-cl {
-    border-left-color: var(--red);
-    background: rgba(240, 98, 146, 0.08);
-    color: #f5b8ce;
-  }
-  .callout.yellow-cl {
-    border-left-color: var(--yellow);
-    background: rgba(255, 213, 79, 0.06);
-    color: #f5e8b0;
-  }
-
-  /* TABLE */
-  .table-wrap { overflow-x: auto; margin: 20px 0; }
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.88rem;
-    min-width: 580px;
-  }
-  th {
-    background: var(--surface2);
-    color: var(--text);
-    font-weight: 600;
-    padding: 12px 16px;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-  }
-  td {
-    padding: 12px 16px;
-    border-bottom: 1px solid rgba(46, 51, 71, 0.6);
-    color: #b8bdd0;
-  }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: rgba(255,255,255,0.02); }
-  td code {
-    background: var(--code-bg);
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    padding: 2px 6px;
-    font-size: 0.83rem;
-  }
-  .check { color: var(--green); font-weight: 700; }
-  .cross { color: var(--red); font-weight: 700; }
-
-  /* GRID */
-  .grid2 {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 14px;
-    margin: 16px 0;
-  }
-  @media (max-width: 600px) {
-    .grid2 { grid-template-columns: 1fr; }
-    .mem-diagram { gap: 12px; }
-  }
-
-  .tag {
-    display: inline-block;
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 3px 8px;
-    border-radius: 5px;
-    margin-right: 6px;
-  }
-  .tag.ok { background: rgba(76,175,125,0.15); color: var(--green); }
-  .tag.no { background: rgba(240,98,146,0.15); color: var(--red); }
-
-  /* ИТОГ */
-  .итог {
-    background: linear-gradient(135deg, rgba(124,106,247,0.12), rgba(79,195,247,0.08));
-    border: 1px solid rgba(124,106,247,0.25);
-    border-radius: 12px;
-    padding: 18px 22px;
-    margin-top: 18px;
-    font-size: 0.92rem;
-  }
-  .итог strong { color: var(--accent); }
-</style>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
-  <h1>C++ Указатели и Ссылки</h1>
-  <p>Пошаговый визуальный гид на русском языке &mdash; *, &amp;, **, *&amp;, const</p>
+  <h1>C++ Гид</h1>
+  <p>Пошаговый визуальный гид — указатели, ссылки и стандарты языка</p>
+  <div class="page-tabs">
+    <button class="page-tab active" data-page="pointers">Указатели и Ссылки</button>
+    <button class="page-tab" data-page="standards">Стандарты C++</button>
+  </div>
 </header>
 
+<div id="page-pointers">
 <nav>
   <a href="#s1">Шаг 1: Переменная</a>
   <a href="#s2">Шаг 2: * Указатель</a>
@@ -331,8 +28,8 @@
   <a href="#s7">Функции</a>
   <a href="#s8">const</a>
   <a href="#s9">Шпаргалка</a>
+  <a href="#" data-switch="standards" class="switch-page">Стандарты C++ →</a>
 </nav>
-
 <main>
 
 <!-- ======================== STEP 1 ======================== -->
@@ -836,6 +533,765 @@ changePtr(p)<span class="op">;</span>
 </section>
 
 </main>
+</div><!-- /page-pointers -->
+
+<div id="page-standards" style="display:none">
+<nav>
+  <a href="#s10">C++11</a>
+  <a href="#s11">C++14</a>
+  <a href="#s12">C++17</a>
+  <a href="#s13">C++20</a>
+  <a href="#s14">C++23</a>
+  <a href="#" data-switch="pointers" class="switch-page">← Указатели</a>
+</nav>
+<main>
+
+<!-- ======================== C++11 ======================== -->
+<section id="s10">
+  <div class="section-header">
+    <div class="step-badge" style="background:linear-gradient(135deg,#4caf7d,#1b5e20);font-size:0.65rem">C++11</div>
+    <h2>C++11 — ISO/IEC 14882:2011 &nbsp;<span style="font-size:0.75rem;font-weight:400;color:var(--muted)">"Modern C++ begins"</span></h2>
+  </div>
+  <div class="card">
+    <p>Революционный стандарт — Страуструп назвал его <em>«другим языком»</em>. Move-семантика устранила лишние копирования и перевернула дизайн типов; lambda-функции похоронили verbose функторы; smart pointers взяли управление памятью на себя. Многопоточность впервые стала частью стандарта — единая модель памяти, <code>std::thread</code>, <code>std::mutex</code>, <code>std::atomic</code>. Именно C++11 превратил C++ в современный язык и заложил фундамент, на котором строится всё последующее.</p>
+  </div>
+
+  <div class="sub-h">Core Language</div>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">auto — вывод типа / decltype — тип выражения</h3>
+<pre><code><span class="kw">auto</span> x  = <span class="num">42</span>;           <span class="cm">// int</span>
+<span class="kw">auto</span> d  = <span class="num">3.14</span>;         <span class="cm">// double</span>
+<span class="kw">auto</span> it = v.begin();   <span class="cm">// std::vector&lt;int&gt;::iterator — без длинного типа</span>
+
+<span class="cm">// decltype — тип выражения без его вычисления</span>
+<span class="kw">int</span> a = <span class="num">5</span>;
+<span class="kw">decltype</span>(a)       b = <span class="num">10</span>;  <span class="cm">// int</span>
+<span class="kw">decltype</span>(a + <span class="num">0.5</span>) c;       <span class="cm">// double</span>
+
+<span class="cm">// trailing return type с decltype:</span>
+<span class="kw">template</span>&lt;<span class="kw">class</span> A, <span class="kw">class</span> B&gt;
+<span class="kw">auto</span> add(A a, B b) -&gt; <span class="kw">decltype</span>(a + b) { <span class="kw">return</span> a + b; }</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Range-based for + Uniform initialization + Initializer lists</h3>
+<pre><code><span class="cm">// {} — единый синтаксис инициализации для всего</span>
+<span class="kw">int</span>              arr[] = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>};
+std::vector&lt;<span class="kw">int</span>&gt;  v   = {<span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>};        <span class="cm">// std::initializer_list</span>
+std::map&lt;<span class="kw">int</span>,<span class="kw">int</span>&gt; m   = {{<span class="num">1</span>,<span class="num">10</span>},{<span class="num">2</span>,<span class="num">20</span>}};
+
+<span class="cm">// Range-based for</span>
+<span class="kw">for</span> (<span class="kw">const auto</span>&amp; x : v)
+    std::cout &lt;&lt; x;  <span class="cm">// 4 5 6</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Lambda expressions</h3>
+<pre><code><span class="cm">// [захват](параметры) -&gt; тип { тело }</span>
+<span class="kw">auto</span> add   = [](<span class="kw">int</span> a, <span class="kw">int</span> b) { <span class="kw">return</span> a + b; };
+
+<span class="kw">int</span> base = <span class="num">10</span>;
+<span class="kw">auto</span> byVal = [base](<span class="kw">int</span> x)  { <span class="kw">return</span> base + x; };  <span class="cm">// захват по значению</span>
+<span class="kw">auto</span> byRef = [&amp;base](<span class="kw">int</span> x) { base += x; };         <span class="cm">// захват по ссылке</span>
+<span class="kw">auto</span> allv  = [=](<span class="kw">int</span> x)    { <span class="kw">return</span> base + x; };   <span class="cm">// всё по значению</span>
+<span class="kw">auto</span> allr  = [&amp;](<span class="kw">int</span> x)    { base += x; };          <span class="cm">// всё по ссылке</span>
+
+std::sort(v.begin(), v.end(), [](<span class="kw">int</span> a, <span class="kw">int</span> b){ <span class="kw">return</span> a &gt; b; });</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Move semantics &amp;&amp; rvalue references</h3>
+<pre><code><span class="cm">// T&amp;&amp; — привязывается к временному/перемещаемому объекту</span>
+std::string s1 = <span class="str">"hello"</span>;
+std::string s2 = std::move(s1);  <span class="cm">// s1 пуст — данные ПЕРЕМЕЩЕНЫ, не скопированы</span>
+
+<span class="cm">// Move-конструктор</span>
+<span class="kw">struct</span> Buf {
+    Buf(Buf&amp;&amp; o) <span class="kw">noexcept</span> : data(o.data) { o.data = <span class="kw">nullptr</span>; }
+    <span class="kw">int</span>* data;
+};
+
+<span class="cm">// std::forward — perfect forwarding, сохраняет lvalue/rvalue-категорию</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> T&gt;
+<span class="kw">void</span> wrapper(T&amp;&amp; val) { process(std::forward&lt;T&gt;(val)); }</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">constexpr — вычисления в compile-time</h3>
+<pre><code><span class="kw">constexpr int</span> square(<span class="kw">int</span> x) { <span class="kw">return</span> x * x; }
+
+<span class="kw">constexpr int</span> SIZE = square(<span class="num">8</span>);  <span class="cm">// 64 — вычислено компилятором</span>
+<span class="kw">int</span> arr[SIZE];                    <span class="cm">// OK: SIZE известен в compile-time</span>
+
+<span class="kw">constexpr double</span> PI = <span class="num">3.14159265358979</span>;</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Variadic templates</h3>
+<pre><code><span class="cm">// ... — пакет параметров произвольной длины</span>
+<span class="cm">// Рекурсивный стиль (C++11):</span>
+<span class="kw">void</span> print() {}
+<span class="kw">template</span>&lt;<span class="kw">typename</span> T, <span class="kw">typename</span>... Rest&gt;
+<span class="kw">void</span> print(T first, Rest... rest) {
+    std::cout &lt;&lt; first; print(rest...);
+}
+print(<span class="num">1</span>, <span class="str">" x "</span>, <span class="num">3.14</span>);  <span class="cm">// 1 x 3.14</span>
+
+<span class="cm">// sizeof...(pack) — количество элементов в пакете</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span>... T&gt; <span class="kw">constexpr</span> <span class="kw">auto</span> count = <span class="kw">sizeof</span>...(T);</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">nullptr, override, final, enum class, noexcept, static_assert</h3>
+<pre><code><span class="kw">int</span>* p = <span class="kw">nullptr</span>;           <span class="cm">// типобезопасный нулевой указатель (не NULL/0)</span>
+
+<span class="kw">struct</span> Base  { <span class="kw">virtual void</span> foo(<span class="kw">int</span>) {} };
+<span class="kw">struct</span> Child : Base { <span class="kw">void</span> foo(<span class="kw">int</span>) <span class="kw">override</span> {} };  <span class="cm">// ошибка если сигнатура не совпадает</span>
+<span class="kw">struct</span> Leaf  <span class="kw">final</span> : Child {};                       <span class="cm">// запрет дальнейшего наследования</span>
+
+<span class="kw">enum class</span> Color { Red, Green, Blue };
+Color c = Color::Red;         <span class="cm">// нет неявного int; квалификатор обязателен</span>
+
+<span class="kw">void</span> safe() <span class="kw">noexcept</span> {}      <span class="cm">// гарантия: не бросает исключений</span>
+<span class="kw">static_assert</span>(sizeof(<span class="kw">int</span>) == <span class="num">4</span>, <span class="str">"int must be 4 bytes"</span>); <span class="cm">// compile-time проверка</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Delegating constructors, explicit conversion, raw strings, UDL</h3>
+<pre><code><span class="cm">// Делегирующий конструктор — вызывает другой конструктор этого же класса</span>
+<span class="kw">struct</span> Foo {
+    Foo() : Foo(<span class="num">0</span>) {}      <span class="cm">// делегирует в Foo(int)</span>
+    Foo(<span class="kw">int</span> x) : val(x) {}
+    <span class="kw">int</span> val;
+};
+
+<span class="cm">// explicit для операторов конверсии — нет случайных преобразований</span>
+<span class="kw">struct</span> Safe { <span class="kw">explicit operator bool</span>() <span class="kw">const</span> { <span class="kw">return</span> valid; } <span class="kw">bool</span> valid; };
+
+<span class="cm">// Raw string literals — без escape-последовательностей</span>
+std::string path = <span class="str">R"(C:\Users\name\file.txt)"</span>;
+std::string re   = <span class="str">R"(\d+\.\d+)"</span>;
+
+<span class="cm">// User-defined literals — собственные суффиксы</span>
+<span class="kw">constexpr long double operator</span>""_km(<span class="kw">long double</span> d) { <span class="kw">return</span> d * <span class="num">1000</span>; }
+<span class="kw">auto</span> dist = <span class="num">1.5</span>_km;  <span class="cm">// 1500.0</span></code></pre>
+
+  <div class="feature-grid">
+    <div class="fi"><div class="fi-dot"></div><div><code>alignas / alignof</code> — управление выравниванием типов и переменных</div></div>
+    <div class="fi"><div class="fi-dot"></div><div>Inline namespaces — вложенные версии API с ADL-прозрачностью</div></div>
+    <div class="fi"><div class="fi-dot"></div><div><code>[[attr]]</code> — расширяемый синтаксис атрибутов компилятора</div></div>
+    <div class="fi"><div class="fi-dot"></div><div><code>char16_t / char32_t</code> — Unicode типы; литералы <code>u"..."</code>, <code>U"..."</code></div></div>
+  </div>
+
+  <div class="sub-h">Standard Library</div>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Smart pointers: unique_ptr, shared_ptr, weak_ptr</h3>
+<pre><code><span class="cm">// unique_ptr — единственный владелец, RAII, без накладных расходов</span>
+std::unique_ptr&lt;<span class="kw">int</span>&gt; u(<span class="kw">new</span> <span class="kw">int</span>(<span class="num">42</span>));  <span class="cm">// delete не нужен</span>
+
+<span class="cm">// shared_ptr — счётчик ссылок, несколько совладельцев</span>
+<span class="kw">auto</span> s1 = std::make_shared&lt;std::string&gt;(<span class="str">"hello"</span>);
+<span class="kw">auto</span> s2 = s1;   <span class="cm">// count == 2</span>
+s1.reset();     <span class="cm">// count == 1</span>
+s2.reset();     <span class="cm">// count == 0; объект удалён</span>
+
+<span class="cm">// weak_ptr — наблюдатель без владения (разрывает циклические ссылки)</span>
+std::weak_ptr&lt;std::string&gt; w = s1;
+<span class="kw">if</span> (<span class="kw">auto</span> lock = w.lock())  <span class="cm">// получить shared_ptr если объект ещё жив</span>
+    std::cout &lt;&lt; *lock;</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">std::thread, std::mutex, std::condition_variable</h3>
+<pre><code>std::mutex mtx;  <span class="kw">int</span> shared = <span class="num">0</span>;
+
+std::thread t1([&amp;]() {
+    std::lock_guard&lt;std::mutex&gt; lock(mtx);  <span class="cm">// RAII-блокировка</span>
+    shared++;
+});
+std::thread t2([&amp;]() {
+    std::unique_lock&lt;std::mutex&gt; lock(mtx); <span class="cm">// гибкий вариант (можно unlock вручную)</span>
+    shared++;
+});
+t1.join(); t2.join();
+
+<span class="cm">// condition_variable — ожидание условия с автоматическим unlock</span>
+std::condition_variable cv;
+cv.wait(lock, []{ <span class="kw">return</span> ready; });  <span class="cm">// атомарно: unlock + sleep; wake-up + relock</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">std::async / std::future / std::promise</h3>
+<pre><code><span class="cm">// async — запуск задачи в пуле потоков</span>
+std::future&lt;<span class="kw">int</span>&gt; f = std::async(std::launch::async, []{ <span class="kw">return</span> <span class="num">42</span>; });
+<span class="kw">int</span> result = f.get();  <span class="cm">// блокирует до готовности</span>
+
+<span class="cm">// promise — ручная передача значения между потоками</span>
+std::promise&lt;std::string&gt; p;
+std::future&lt;std::string&gt;  fut = p.get_future();
+std::thread([&amp;p]{ p.set_value(<span class="str">"done"</span>); }).detach();
+std::cout &lt;&lt; fut.get();  <span class="cm">// "done"</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">std::array, std::unordered_map/set, std::tuple</h3>
+<pre><code><span class="cm">// std::array — C-массив с методами STL, без heap-аллокации</span>
+std::array&lt;<span class="kw">int</span>, <span class="num">3</span>&gt; arr = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>};
+arr.size(); arr.fill(<span class="num">0</span>); arr.data();
+
+<span class="cm">// std::unordered_map — хэш-таблица, O(1) среднее время</span>
+std::unordered_map&lt;std::string, <span class="kw">int</span>&gt; m;
+m[<span class="str">"a"</span>] = <span class="num">1</span>;
+
+<span class="cm">// std::tuple — гетерогенный набор значений</span>
+<span class="kw">auto</span> t = std::make_tuple(<span class="num">1</span>, <span class="str">"hi"</span>, <span class="num">3.14</span>);
+<span class="kw">auto</span> x = std::get&lt;<span class="num">0</span>&gt;(t);  <span class="cm">// 1</span>
+<span class="kw">int</span> a; std::string b;
+std::tie(a, b, std::ignore) = t;</code></pre>
+
+  <div class="feature-grid">
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::function</code> — обёртка над любым вызываемым (функция, лямбда, метод)</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::bind</code> — привязка аргументов; частичное применение функции</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::regex</code> — регулярные выражения (<code>regex_match</code>, <code>regex_search</code>)</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::chrono</code> — <code>duration</code>, <code>time_point</code>, <code>steady_clock</code>, <code>system_clock</code></div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::begin / std::end</code> — ADL-совместимый доступ к диапазонам</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::move / std::forward</code> — утилиты move-семантики</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>&lt;type_traits&gt;</code> — <code>is_integral_v</code>, <code>enable_if</code>, <code>conditional</code>, <code>decay</code> и др.</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::atomic&lt;T&gt;</code> — атомарные операции без mutex; поддержка memory_order</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::unordered_set</code> — хэш-множество O(1)</div></div>
+  </div>
+
+  <div class="итог"><strong>C++11:</strong> auto/decltype, lambda, move&amp;&amp;, constexpr, variadic templates, nullptr, override/final, enum class, noexcept — фундамент всего современного C++.</div>
+</section>
+
+<!-- ======================== C++14 ======================== -->
+<section id="s11">
+  <div class="section-header">
+    <div class="step-badge" style="background:linear-gradient(135deg,#4fc3f7,#0288d1);font-size:0.65rem">C++14</div>
+    <h2>C++14 — ISO/IEC 14882:2014 &nbsp;<span style="font-size:0.75rem;font-weight:400;color:var(--muted)">"Polishing C++11"</span></h2>
+  </div>
+  <div class="card">
+    <p>Небольшой, но важный стандарт — «полировка» C++11, устраняющая практические ограничения. Generic lambdas с <code>auto</code>-параметрами избавили от необходимости писать шаблонные функторы вручную; relaxed constexpr позволил использовать циклы и условия в compile-time функциях. Variable templates упростили параметризованные константы вроде <code>pi&lt;float&gt;</code>. Добавлен недостающий <code>std::make_unique</code>, UDL для <code>&lt;chrono&gt;</code> (<code>1h</code>, <code>500ms</code>) и <code>&lt;string&gt;</code> (<code>"hello"s</code>).</p>
+  </div>
+
+  <div class="sub-h">Core Language</div>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Generic lambdas + Lambda init-captures</h3>
+<pre><code><span class="cm">// C++14: auto-параметры — лямбда становится шаблонной функцией</span>
+<span class="kw">auto</span> add = [](<span class="kw">auto</span> a, <span class="kw">auto</span> b) { <span class="kw">return</span> a + b; };
+add(<span class="num">1</span>, <span class="num">2</span>);                 <span class="cm">// int</span>
+add(<span class="num">1.5</span>, <span class="num">2.5</span>);            <span class="cm">// double</span>
+add(std::string{<span class="str">"a"</span>}, std::string{<span class="str">"b"</span>}); <span class="cm">// string</span>
+
+<span class="cm">// Lambda init-capture — создание/инициализация переменной прямо в захвате</span>
+<span class="kw">auto</span> ptr = std::make_unique&lt;<span class="kw">int</span>&gt;(<span class="num">42</span>);
+<span class="kw">auto</span> f   = [p = std::move(ptr)]() { <span class="kw">return</span> *p; };  <span class="cm">// перемещение в захват</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Return type deduction + Relaxed constexpr</h3>
+<pre><code><span class="cm">// Компилятор выводит тип возврата из return-выражений</span>
+<span class="kw">auto</span> mul(<span class="kw">int</span> a, <span class="kw">int</span> b) { <span class="kw">return</span> a * b; }            <span class="cm">// → int</span>
+<span class="kw">auto</span> wrap(<span class="kw">int</span> x)       { <span class="kw">return</span> std::pair{x, x*<span class="num">2</span>}; }  <span class="cm">// → pair&lt;int,int&gt;</span>
+
+<span class="cm">// Relaxed constexpr: C++11 запрещал циклы и условия — C++14 снял ограничение</span>
+<span class="kw">constexpr int</span> factorial(<span class="kw">int</span> n) {
+    <span class="kw">int</span> r = <span class="num">1</span>;
+    <span class="kw">for</span> (<span class="kw">int</span> i = <span class="num">2</span>; i &lt;= n; ++i) r *= i;
+    <span class="kw">return</span> r;
+}
+<span class="kw">constexpr int</span> f6 = factorial(<span class="num">6</span>);  <span class="cm">// 720 — в compile-time</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Variable templates</h3>
+<pre><code><span class="cm">// Шаблонные переменные — параметризованные константы</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> T&gt;
+<span class="kw">constexpr</span> T pi = T(<span class="num">3.14159265358979</span>);
+
+<span class="kw">auto</span> a = pi&lt;<span class="kw">float</span>&gt;;    <span class="cm">// 3.14159f</span>
+<span class="kw">auto</span> b = pi&lt;<span class="kw">double</span>&gt;;  <span class="cm">// 3.14159265358979</span>
+<span class="kw">auto</span> c = pi&lt;<span class="kw">int</span>&gt;;     <span class="cm">// 3</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Binary literals + Digit separators</h3>
+<pre><code><span class="cm">// Двоичные литералы с префиксом 0b</span>
+<span class="kw">int</span> flags = <span class="num">0b1010'1100</span>;     <span class="cm">// = 172</span>
+
+<span class="cm">// Разделитель разрядов ' — только для читаемости, на значение не влияет</span>
+<span class="kw">long</span>   million = <span class="num">1'000'000</span>;
+<span class="kw">double</span> pi      = <span class="num">3.141'592'653</span>;
+<span class="kw">int</span>    mask    = <span class="num">0xFF'FF'FF'FF</span>;</code></pre>
+
+  <div class="feature-grid">
+    <div class="fi"><div class="fi-dot"></div><div><code>[[deprecated]]</code> / <code>[[deprecated("reason")]]</code> — предупреждение при использовании помеченного API</div></div>
+  </div>
+
+  <div class="sub-h">Standard Library</div>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">std::make_unique + std::integer_sequence + std::exchange</h3>
+<pre><code><span class="cm">// make_unique — безопасно и симметрично с make_shared (не было в C++11!)</span>
+<span class="kw">auto</span> p = std::make_unique&lt;std::string&gt;(<span class="str">"hello"</span>);
+
+<span class="cm">// integer_sequence — список индексов в compile-time (для tuple и pack expansion)</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> Tuple, std::size_t... I&gt;
+<span class="kw">void</span> printTuple(<span class="kw">const</span> Tuple&amp; t, std::index_sequence&lt;I...&gt;) {
+    ((std::cout &lt;&lt; std::get&lt;I&gt;(t) &lt;&lt; <span class="str">' '</span>), ...);
+}
+
+<span class="cm">// exchange — атомарная замена: вернуть старое, записать новое</span>
+<span class="kw">int</span> old = std::exchange(x, newVal);  <span class="cm">// old = x; x = newVal;</span></code></pre>
+
+  <div class="feature-grid">
+    <div class="fi"><div class="fi-dot b"></div><div>Heterogeneous lookup в <code>std::map/set</code>: поиск без создания объекта ключа (<code>find("key")</code> не создаёт <code>std::string</code>)</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::shared_timed_mutex</code> — read-write мьютекс (shared для чтения, exclusive для записи)</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div>UDL для <code>&lt;chrono&gt;</code>: <code>1h</code>, <code>30min</code>, <code>500ms</code>, <code>1us</code>, <code>1ns</code></div></div>
+    <div class="fi"><div class="fi-dot b"></div><div>UDL для <code>&lt;string&gt;</code>: суффикс <code>s</code> создаёт <code>std::string</code>: <code>"hello"s</code></div></div>
+  </div>
+
+  <div class="итог"><strong>C++14:</strong> generic lambdas, init-captures, relaxed constexpr, variable templates, make_unique, binary literals — небольшой, но важный шаг.</div>
+</section>
+
+<!-- ======================== C++17 ======================== -->
+<section id="s12">
+  <div class="section-header">
+    <div class="step-badge" style="background:linear-gradient(135deg,#7c6af7,#5e54e8);font-size:0.65rem">C++17</div>
+    <h2>C++17 — ISO/IEC 14882:2017 &nbsp;<span style="font-size:0.75rem;font-weight:400;color:var(--muted)">"Big quality-of-life update"</span></h2>
+  </div>
+  <div class="card">
+    <p>Крупное обновление с акцентом на эргономику кода. Structured bindings устранили синтаксический шум при работе с парами и картами; <code>if constexpr</code> заменил громоздкий SFINAE в большинстве шаблонных задач; fold expressions сделали variadic код читаемым без рекурсии. В библиотеке наконец появились <code>std::optional</code>, <code>std::variant</code>, <code>std::string_view</code> и <code>std::filesystem</code> — вещи, которых не хватало годами, — а параллельные алгоритмы (<code>std::execution::par</code>) добавили многопоточность одной строкой.</p>
+  </div>
+
+  <div class="sub-h">Core Language</div>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Structured bindings</h3>
+<pre><code><span class="cm">// auto [a, b, ...] — распаковка пары / tuple / aggregate struct</span>
+<span class="kw">auto</span> [num, name] = std::pair{<span class="num">1</span>, <span class="str">"one"</span>};
+
+<span class="cm">// Идиоматично в range-for по map</span>
+std::map&lt;std::string, <span class="kw">int</span>&gt; scores {{"Alice",<span class="num">95</span>},{"Bob",<span class="num">87</span>}};
+<span class="kw">for</span> (<span class="kw">const auto</span>&amp; [key, val] : scores)
+    std::cout &lt;&lt; key &lt;&lt; <span class="str">": "</span> &lt;&lt; val;
+
+<span class="cm">// Распаковка aggregate struct</span>
+<span class="kw">struct</span> Point { <span class="kw">int</span> x, y; };
+<span class="kw">auto</span> [px, py] = Point{<span class="num">3</span>, <span class="num">4</span>};</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">if / switch с инициализатором</h3>
+<pre><code><span class="cm">// Переменная it живёт только внутри if-блока — нет утечки в scope</span>
+<span class="kw">if</span> (<span class="kw">auto</span> it = m.find(<span class="str">"key"</span>); it != m.end())
+    std::cout &lt;&lt; it-&gt;second;
+
+<span class="cm">// switch тоже поддерживает инициализатор:</span>
+<span class="kw">switch</span> (<span class="kw">auto</span> status = getStatus(); status) {
+    <span class="kw">case</span> OK:    <span class="kw">break</span>;
+    <span class="kw">case</span> Error: <span class="kw">break</span>;
+}</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">if constexpr — ветвление на этапе компиляции</h3>
+<pre><code><span class="kw">template</span>&lt;<span class="kw">typename</span> T&gt;
+<span class="kw">void</span> describe(T val) {
+    <span class="kw">if constexpr</span> (std::is_integral_v&lt;T&gt;)
+        std::cout &lt;&lt; <span class="str">"int: "</span> &lt;&lt; val;
+    <span class="kw">else if constexpr</span> (std::is_floating_point_v&lt;T&gt;)
+        std::cout &lt;&lt; <span class="str">"float: "</span> &lt;&lt; val;
+    <span class="kw">else</span>
+        std::cout &lt;&lt; <span class="str">"other"</span>;
+    <span class="cm">// неиспользуемые ветки не инстанцируются — нет ошибок компиляции!</span>
+}</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Fold expressions</h3>
+<pre><code><span class="cm">// Свёртка пакета параметров без рекурсии</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span>... Args&gt;
+<span class="kw">auto</span> sum(Args... args) { <span class="kw">return</span> (args + ...); }       <span class="cm">// unary right fold</span>
+sum(<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>, <span class="num">4</span>);  <span class="cm">// 10</span>
+
+<span class="kw">template</span>&lt;<span class="kw">typename</span>... Args&gt;
+<span class="kw">void</span> printAll(Args... args) { (std::cout &lt;&lt; ... &lt;&lt; args); }
+
+<span class="kw">template</span>&lt;<span class="kw">typename</span>... Args&gt;
+<span class="kw">bool</span> allTrue(Args... args) { <span class="kw">return</span> (... &amp;&amp; args); }   <span class="cm">// unary left fold</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">CTAD — Class Template Argument Deduction</h3>
+<pre><code><span class="cm">// До C++17 — тип указывался явно:</span>
+std::pair&lt;<span class="kw">int</span>, std::string&gt; p1{<span class="num">1</span>, <span class="str">"a"</span>};
+
+<span class="cm">// C++17 — компилятор выводит аргументы шаблона из конструктора:</span>
+std::pair   p2{<span class="num">1</span>, <span class="str">"a"</span>};         <span class="cm">// pair&lt;int, const char*&gt;</span>
+std::vector v{<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>};          <span class="cm">// vector&lt;int&gt;</span>
+std::tuple  t{<span class="num">1</span>, <span class="num">2.0</span>, <span class="str">"three"</span>};  <span class="cm">// tuple&lt;int, double, const char*&gt;</span>
+std::lock_guard lock{mtx};        <span class="cm">// lock_guard&lt;std::mutex&gt;</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Inline variables</h3>
+<pre><code><span class="cm">// До C++17: static const в заголовке = multiple definition ошибка</span>
+<span class="cm">// C++17: inline переменная может быть определена в нескольких TU</span>
+<span class="kw">struct</span> Config {
+    <span class="kw">inline static int</span> maxRetries = <span class="num">3</span>;  <span class="cm">// OK в C++17</span>
+};
+<span class="kw">inline constexpr double</span> PI = <span class="num">3.14159265</span>;  <span class="cm">// в заголовке без нарушения ODR</span></code></pre>
+
+  <div class="feature-grid">
+    <div class="fi"><div class="fi-dot"></div><div><code>[[nodiscard]]</code> — предупреждение если возвращаемое значение игнорируется</div></div>
+    <div class="fi"><div class="fi-dot"></div><div><code>[[maybe_unused]]</code> — подавляет предупреждение о неиспользуемой переменной</div></div>
+    <div class="fi"><div class="fi-dot"></div><div><code>[[fallthrough]]</code> — явный провал в следующий case в switch</div></div>
+    <div class="fi"><div class="fi-dot"></div><div>Guaranteed copy elision (RVO обязателен) — компилятор не копирует при возврате</div></div>
+    <div class="fi"><div class="fi-dot"></div><div>constexpr lambdas — лямбды могут быть <code>constexpr</code></div></div>
+    <div class="fi"><div class="fi-dot"></div><div><code>noexcept</code> как часть типа: <code>void() noexcept</code> ≠ <code>void()</code></div></div>
+  </div>
+
+  <div class="sub-h">Standard Library</div>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">std::optional — значение или nullopt</h3>
+<pre><code>std::optional&lt;<span class="kw">int</span>&gt; divide(<span class="kw">int</span> a, <span class="kw">int</span> b) {
+    <span class="kw">if</span> (b == <span class="num">0</span>) <span class="kw">return</span> std::nullopt;
+    <span class="kw">return</span> a / b;
+}
+<span class="kw">auto</span> r = divide(<span class="num">10</span>, <span class="num">2</span>);
+<span class="kw">if</span> (r) std::cout &lt;&lt; *r;              <span class="cm">// 5</span>
+std::cout &lt;&lt; r.value_or(-<span class="num">1</span>);        <span class="cm">// 5 или -1 если пусто</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">std::variant — типобезопасный union</h3>
+<pre><code>std::variant&lt;<span class="kw">int</span>, <span class="kw">double</span>, std::string&gt; v;
+v = <span class="num">42</span>;  v = <span class="num">3.14</span>;  v = <span class="str">"hello"</span>;
+
+std::cout &lt;&lt; std::get&lt;std::string&gt;(v);     <span class="cm">// "hello"</span>
+std::visit([](<span class="kw">auto</span>&amp; val){ std::cout &lt;&lt; val; }, v); <span class="cm">// визитор</span>
+
+<span class="kw">if</span> (std::holds_alternative&lt;<span class="kw">int</span>&gt;(v)) { <span class="cm">/* ... */</span> }</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">std::string_view + std::any</h3>
+<pre><code><span class="cm">// string_view — non-owning ссылка на строку (нулевые копии)</span>
+<span class="kw">void</span> log(std::string_view msg) {      <span class="cm">// принимает string, const char*, literal</span>
+    std::cout &lt;&lt; msg.substr(<span class="num">0</span>, <span class="num">50</span>); <span class="cm">// без аллокации!</span>
+}
+
+<span class="cm">// std::any — контейнер для любого типа (как void* но типобезопасно)</span>
+std::any a = <span class="num">42</span>;
+a = std::string{<span class="str">"hi"</span>};
+std::cout &lt;&lt; std::any_cast&lt;std::string&gt;(a);</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">std::filesystem</h3>
+<pre><code><span class="kw">namespace</span> fs = std::filesystem;
+
+fs::path p = <span class="str">"C:/Users/name/file.txt"</span>;
+p.filename();      <span class="cm">// "file.txt"</span>
+p.extension();     <span class="cm">// ".txt"</span>
+p.parent_path();   <span class="cm">// "C:/Users/name"</span>
+
+fs::create_directories(<span class="str">"dir/sub"</span>);
+fs::copy(<span class="str">"src.txt"</span>, <span class="str">"dst.txt"</span>);
+
+<span class="kw">for</span> (<span class="kw">const auto</span>&amp; e : fs::directory_iterator(<span class="str">"."</span>))
+    std::cout &lt;&lt; e.path();</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Параллельные алгоритмы</h3>
+<pre><code><span class="cm">// Execution policies — параллелизм одной строкой</span>
+std::sort(std::execution::par, v.begin(), v.end());
+
+std::transform(std::execution::par_unseq,
+    v.begin(), v.end(), v.begin(),
+    [](<span class="kw">int</span> x){ <span class="kw">return</span> x * x; });</code></pre>
+
+  <div class="feature-grid">
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::byte</code> — тип для работы с сырыми байтами (не <code>char</code> и не <code>int</code>)</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::clamp(v, lo, hi)</code> — ограничение значения в диапазоне [lo, hi]</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::sample</code> — случайная выборка N элементов из диапазона</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::gcd / std::lcm</code> — НОД и НОК (compile-time или runtime)</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::apply(f, tuple)</code> — вызов f с элементами tuple как аргументами</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::invoke(f, args...)</code> — унифицированный вызов любого callable</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::as_const(x)</code> — получить const-ссылку без явного cast</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::size / std::data / std::empty</code> — ADL-доступ к метаданным контейнера</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::shared_mutex</code> — read-write lock (shared для чтения, exclusive для записи)</div></div>
+  </div>
+
+  <div class="итог"><strong>C++17:</strong> structured bindings, if-init, if constexpr, fold expressions, CTAD, inline vars, optional, variant, string_view, filesystem, параллельные алгоритмы.</div>
+</section>
+
+<!-- ======================== C++20 ======================== -->
+<section id="s13">
+  <div class="section-header">
+    <div class="step-badge" style="background:linear-gradient(135deg,#ffb74d,#e65100);font-size:0.65rem">C++20</div>
+    <h2>C++20 — ISO/IEC 14882:2020 &nbsp;<span style="font-size:0.75rem;font-weight:400;color:var(--muted)">"Biggest since C++11"</span></h2>
+  </div>
+  <div class="card">
+    <p>Самый крупный стандарт со времён C++11 — четыре кита. <strong>Concepts</strong> сделали шаблоны читаемыми и дают понятные ошибки компиляции вместо стены текста. <strong>Ranges</strong> принесли ленивые конвейеры над данными через оператор <code>|</code>. <strong>Coroutines</strong> добавили <code>co_await / co_yield</code> для async-кода и генераторов без колбэков. <strong>Modules</strong> заменили <code>#include</code> изолированной системой с гарантированным ODR. В довесок: spaceship <code>&lt;=&gt;</code> автоматически генерирует все операторы сравнения, <code>std::format</code> даёт type-safe форматирование, <code>consteval</code> гарантирует compile-time выполнение.</p>
+  </div>
+
+  <div class="sub-h">Core Language</div>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Concepts — ограничения шаблонов</h3>
+<pre><code><span class="cm">// До C++20: ошибки шаблонов — стена нечитаемого текста</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> T&gt;
+<span class="kw">concept</span> Numeric = std::is_arithmetic_v&lt;T&gt;;
+
+<span class="kw">template</span>&lt;Numeric T&gt;            <span class="cm">// T обязан быть числовым</span>
+T square(T x) { <span class="kw">return</span> x * x; }
+
+square(<span class="num">5</span>);       <span class="cm">// OK</span>
+square(<span class="str">"hi"</span>);   <span class="cm">// ошибка — читаемое сообщение: "string не удовлетворяет Numeric"</span>
+
+<span class="cm">// requires-expression — произвольные ограничения на операции</span>
+<span class="kw">template</span>&lt;<span class="kw">typename</span> T&gt;
+<span class="kw">concept</span> Addable = <span class="kw">requires</span>(T a, T b) { a + b; };
+
+<span class="cm">// Краткий синтаксис (abbreviated template):</span>
+<span class="kw">auto</span> square(Numeric <span class="kw">auto</span> x) { <span class="kw">return</span> x * x; }</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Modules — замена #include</h3>
+<pre><code><span class="cm">// mymath.ixx — объявление модуля</span>
+<span class="kw">export module</span> mymath;
+
+<span class="kw">export int</span> square(<span class="kw">int</span> x) { <span class="kw">return</span> x * x; }
+<span class="kw">export double</span> pi = <span class="num">3.14159</span>;
+
+<span class="kw">int</span> helper() { <span class="kw">return</span> <span class="num">0</span>; }  <span class="cm">// не экспортируется — скрыт от клиентов</span>
+
+<span class="cm">// main.cpp</span>
+<span class="kw">import</span> mymath;
+<span class="kw">import</span> std;  <span class="cm">// весь стандарт как один модуль (C++23 практика)</span>
+
+<span class="kw">int</span> main() { std::println(<span class="str">"{}"</span>, square(<span class="num">5</span>)); }</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Coroutines — co_await, co_yield, co_return</h3>
+<pre><code><span class="cm">// Функция-coroutine: может приостановиться и возобновиться</span>
+<span class="cm">// (Требует coroutine-фреймворк; ниже показан std::generator из C++23)</span>
+
+<span class="cm">// co_yield — генератор значений</span>
+std::generator&lt;<span class="kw">int</span>&gt; range(<span class="kw">int</span> from, <span class="kw">int</span> to) {
+    <span class="kw">for</span> (<span class="kw">int</span> i = from; i &lt; to; ++i)
+        <span class="kw">co_yield</span> i;         <span class="cm">// приостановиться, вернуть i</span>
+}
+<span class="kw">for</span> (<span class="kw">int</span> x : range(<span class="num">0</span>, <span class="num">5</span>)) std::cout &lt;&lt; x;  <span class="cm">// 0 1 2 3 4</span>
+
+<span class="cm">// co_await — асинхронное ожидание (в async-фреймворке)</span>
+Task&lt;<span class="kw">int</span>&gt; fetch() {
+    <span class="kw">auto</span> data = <span class="kw">co_await</span> httpGet(<span class="str">"/api"</span>);
+    <span class="kw">co_return</span> process(data);
+}</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Ranges — ленивые конвейеры</h3>
+<pre><code>std::vector&lt;<span class="kw">int</span>&gt; v = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>,<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>};
+
+<span class="cm">// Конвейер через | — вычисляется лениво (нет промежуточных векторов)</span>
+<span class="kw">auto</span> result = v
+    | std::views::filter([](<span class="kw">int</span> x){ <span class="kw">return</span> x % <span class="num">2</span> == <span class="num">0</span>; })
+    | std::views::transform([](<span class="kw">int</span> x){ <span class="kw">return</span> x * x; })
+    | std::views::take(<span class="num">3</span>);
+<span class="cm">// result: 4, 16, 36</span>
+
+<span class="cm">// Алгоритмы принимают range напрямую:</span>
+std::ranges::sort(v);
+<span class="kw">auto</span> it = std::ranges::find(v, <span class="num">3</span>);
+
+<span class="cm">// std::views::iota — числовой диапазон без вектора</span>
+<span class="kw">for</span> (<span class="kw">int</span> i : std::views::iota(<span class="num">0</span>, <span class="num">10</span>)) { <span class="cm">/* ... */</span> }</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Spaceship &lt;=&gt; + Designated initializers + consteval/constinit</h3>
+<pre><code><span class="cm">// &lt;=&gt; генерирует все операторы сравнения автоматически</span>
+<span class="kw">struct</span> Point {
+    <span class="kw">int</span> x, y;
+    <span class="kw">auto operator</span>&lt;=&gt;(<span class="kw">const</span> Point&amp;) <span class="kw">const</span> = <span class="kw">default</span>;  <span class="cm">// &lt;, &lt;=, &gt;, &gt;=, ==, !=</span>
+};
+
+<span class="cm">// Designated initializers — инициализация по имени поля</span>
+<span class="kw">struct</span> Config { <span class="kw">int</span> w = <span class="num">800</span>, h = <span class="num">600</span>; <span class="kw">bool</span> fs = <span class="kw">false</span>; };
+Config cfg{ .w = <span class="num">1920</span>, .h = <span class="num">1080</span> };     <span class="cm">// fs остаётся false</span>
+
+<span class="cm">// consteval — ТОЛЬКО compile-time (в отличие от constexpr)</span>
+<span class="kw">consteval int</span> ctOnly(<span class="kw">int</span> x) { <span class="kw">return</span> x * x; }
+
+<span class="cm">// constinit — compile-time инициализация, но переменная mutable</span>
+<span class="kw">constinit int</span> globalVal = <span class="num">42</span>;   <span class="cm">// guaranteed init order</span></code></pre>
+
+  <div class="feature-grid">
+    <div class="fi"><div class="fi-dot"></div><div>Template params on lambdas: <code>[]&lt;typename T&gt;(T x){ ... }</code></div></div>
+    <div class="fi"><div class="fi-dot"></div><div><code>[[likely]] / [[unlikely]]</code> — подсказка оптимизатору о вероятности ветки</div></div>
+    <div class="fi"><div class="fi-dot"></div><div><code>[[no_unique_address]]</code> — EBO-оптимизация для пустых полей struct</div></div>
+    <div class="fi"><div class="fi-dot"></div><div><code>char8_t</code> — тип для UTF-8; литерал <code>u8"..."</code> теперь <code>const char8_t[]</code></div></div>
+    <div class="fi"><div class="fi-dot"></div><div><code>using enum</code> — импорт имён enum class в текущий scope</div></div>
+    <div class="fi"><div class="fi-dot"></div><div><code>__VA_OPT__(x)</code> — x подставляется в макрос только если есть varargs</div></div>
+    <div class="fi"><div class="fi-dot"></div><div>Aggregate init improvements — базовые классы в <code>{}</code></div></div>
+  </div>
+
+  <div class="sub-h">Standard Library</div>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">std::span + std::format</h3>
+<pre><code><span class="cm">// std::span — non-owning вид на непрерывный массив (не владеет данными)</span>
+<span class="kw">int</span> arr[] = {<span class="num">1</span>,<span class="num">2</span>,<span class="num">3</span>};  std::vector&lt;<span class="kw">int</span>&gt; vec = {<span class="num">4</span>,<span class="num">5</span>,<span class="num">6</span>};
+<span class="kw">void</span> sum(std::span&lt;<span class="kw">const int</span>&gt; d) { <span class="kw">return</span> std::reduce(d.begin(), d.end()); }
+sum(arr);  sum(vec);  <span class="cm">// единая функция для всего</span>
+
+<span class="cm">// std::format — форматирование строк как Python f-string</span>
+std::string s = std::format(<span class="str">"Hello, {}! Pi = {:.2f}"</span>, name, <span class="num">3.14159</span>);
+std::format(<span class="str">"{:&gt;10}"</span>, <span class="num">42</span>);      <span class="cm">// "        42"</span>
+std::format(<span class="str">"{:#010x}"</span>, <span class="num">255</span>);  <span class="cm">// "0x000000ff"</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">std::jthread + std::stop_token</h3>
+<pre><code><span class="cm">// jthread — auto-joining thread с поддержкой cancellation</span>
+std::jthread t([](<span class="kw">std::stop_token</span> st) {
+    <span class="kw">while</span> (!st.stop_requested()) {
+        doWork();
+    }
+});
+<span class="cm">// t.request_stop() — попросить остановиться</span>
+<span class="cm">// Деструктор автоматически вызывает stop + join — не нужен явный join</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">std::bit_cast + std::endian + std::numbers</h3>
+<pre><code><span class="cm">// bit_cast — переинтерпретация битов без UB (замена reinterpret_cast)</span>
+<span class="kw">float</span>    f    = <span class="num">1.0f</span>;
+uint32_t bits = std::bit_cast&lt;uint32_t&gt;(f);  <span class="cm">// 0x3F800000</span>
+
+<span class="cm">// endian — порядок байт на текущей платформе</span>
+<span class="kw">if constexpr</span> (std::endian::native == std::endian::little) { <span class="cm">/* ... */</span> }
+
+<span class="cm">// numbers — математические константы в &lt;numbers&gt;</span>
+<span class="kw">double</span> pi  = std::numbers::pi;    <span class="cm">// 3.14159265358979...</span>
+<span class="kw">double</span> e   = std::numbers::e;     <span class="cm">// 2.71828...</span>
+<span class="kw">double</span> phi = std::numbers::phi;   <span class="cm">// 1.61803... (золотое сечение)</span></code></pre>
+
+  <div class="feature-grid">
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::barrier / std::latch</code> — примитивы синхронизации для групп потоков</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::counting_semaphore</code> — семафор с заданным максимальным счётчиком</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::stop_source / stop_token</code> — кооперативная отмена задач</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::to_address(ptr)</code> — получить указатель из fancy pointer</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div>Calendar + timezone в <code>&lt;chrono&gt;</code>: <code>year_month_day</code>, <code>zoned_time</code>, <code>time_zone</code></div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::is_constant_evaluated()</code> — проверка: выполняется ли код в compile-time</div></div>
+    <div class="fi"><div class="fi-dot b"></div><div><code>std::ranges</code> — полный набор range-based алгоритмов (<code>find_if</code>, <code>copy_if</code>, <code>any_of</code>…)</div></div>
+  </div>
+
+  <div class="итог"><strong>C++20:</strong> Concepts, Modules, Coroutines, Ranges, &lt;=&gt;, consteval/constinit, designated init, std::format, span, jthread — фундаментальная переработка языка.</div>
+</section>
+
+<!-- ======================== C++23 ======================== -->
+<section id="s14">
+  <div class="section-header">
+    <div class="step-badge" style="background:linear-gradient(135deg,#f06292,#c2185b);font-size:0.65rem">C++23</div>
+    <h2>C++23 — ISO/IEC 14882:2023 &nbsp;<span style="font-size:0.75rem;font-weight:400;color:var(--muted)">"Current standard"</span></h2>
+  </div>
+  <div class="card">
+    <p>Текущий стандарт, продолжающий путь C++20. <code>std::expected&lt;T,E&gt;</code> привнёс функциональный стиль обработки ошибок без исключений — явный тип вместо <code>errno</code> или кодов возврата. <strong>Deducing this</strong> (explicit object parameter) устранил дублирование <code>const</code>/<code>non-const</code> перегрузок и открыл рекурсивные lambdas. <code>std::print/println</code> объединили <code>std::format</code> и вывод в один вызов. Ranges получили <code>zip</code>, <code>enumerate</code>, <code>chunk</code>, <code>slide</code>, <code>cartesian_product</code> и <code>ranges::to</code> для материализации ленивых view в контейнеры.</p>
+  </div>
+
+  <div class="sub-h">Core Language</div>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Deducing this — explicit object parameter</h3>
+<pre><code><span class="cm">// this передаётся как явный параметр — устраняет дублирование const/non-const версий</span>
+<span class="kw">struct</span> Widget {
+    <span class="kw">template</span>&lt;<span class="kw">typename</span> Self&gt;
+    <span class="kw">auto</span>&amp; value(<span class="kw">this</span> Self&amp;&amp; self) { <span class="kw">return</span> self.m_value; }
+    <span class="kw">int</span> m_value = <span class="num">0</span>;
+};
+
+<span class="cm">// Рекурсивные лямбды — главный use case:</span>
+<span class="kw">auto</span> factorial = [](<span class="kw">this auto</span> self, <span class="kw">int</span> n) -&gt; <span class="kw">int</span> {
+    <span class="kw">return</span> n &lt;= <span class="num">1</span> ? <span class="num">1</span> : n * self(n - <span class="num">1</span>);
+};
+factorial(<span class="num">5</span>);  <span class="cm">// 120</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">if consteval + auto в параметрах функций</h3>
+<pre><code><span class="cm">// if consteval — ветвление по факту compile-time/runtime</span>
+<span class="kw">constexpr int</span> get(<span class="kw">int</span> x) {
+    <span class="kw">if consteval</span> { <span class="kw">return</span> x * <span class="num">2</span>; }  <span class="cm">// compile-time путь</span>
+    <span class="kw">else</span>          { <span class="kw">return</span> x + <span class="num">1</span>; }  <span class="cm">// runtime путь</span>
+}
+
+<span class="cm">// auto в обычных параметрах функций (не только lambdas/templates)</span>
+<span class="kw">void</span> print(<span class="kw">auto</span> val) { std::cout &lt;&lt; val; }
+<span class="cm">// Эквивалентно: template&lt;typename T&gt; void print(T val)</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Multidimensional subscript operator a[x, y, z]</h3>
+<pre><code><span class="cm">// operator[] теперь принимает несколько аргументов</span>
+<span class="kw">struct</span> Matrix {
+    <span class="kw">double</span>&amp; <span class="kw">operator</span>[](std::size_t row, std::size_t col) {
+        <span class="kw">return</span> data[row * cols + col];
+    }
+    <span class="kw">double</span>* data; std::size_t cols;
+};
+Matrix m{...};
+m[<span class="num">2</span>, <span class="num">3</span>] = <span class="num">1.0</span>;  <span class="cm">// до C++23 нужен был m(2,3) или m[{2,3}]</span></code></pre>
+
+  <div class="feature-grid">
+    <div class="fi"><div class="fi-dot"></div><div>Simplified implicit move: <code>return local;</code> всегда выбирает move если возможно</div></div>
+    <div class="fi"><div class="fi-dot"></div><div><code>[[assume(expr)]]</code> — подсказка оптимизатору: expr всегда истинно (UB если нет)</div></div>
+    <div class="fi"><div class="fi-dot"></div><div>Labels at end of compound statements: метка перед <code>}</code> больше не синтаксическая ошибка</div></div>
+  </div>
+
+  <div class="sub-h">Standard Library</div>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">std::expected — обработка ошибок без исключений</h3>
+<pre><code><span class="cm">// expected&lt;T, E&gt; — либо значение T, либо ошибка E — явно в типе</span>
+std::expected&lt;<span class="kw">int</span>, std::string&gt; divide(<span class="kw">int</span> a, <span class="kw">int</span> b) {
+    <span class="kw">if</span> (b == <span class="num">0</span>) <span class="kw">return</span> std::unexpected(<span class="str">"division by zero"</span>);
+    <span class="kw">return</span> a / b;
+}
+<span class="kw">auto</span> r = divide(<span class="num">10</span>, <span class="num">0</span>);
+<span class="kw">if</span> (r)   std::cout &lt;&lt; r.value();
+<span class="kw">else</span>     std::cout &lt;&lt; r.error();   <span class="cm">// "division by zero"</span>
+
+<span class="cm">// Монадическая цепочка без вложенного if:</span>
+<span class="kw">auto</span> result = divide(<span class="num">10</span>, <span class="num">2</span>)
+    .and_then([](<span class="kw">int</span> v) -&gt; std::expected&lt;<span class="kw">int</span>, std::string&gt; { <span class="kw">return</span> v * <span class="num">2</span>; })
+    .value_or(-<span class="num">1</span>);  <span class="cm">// 10</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">std::print / std::println</h3>
+<pre><code>std::println(<span class="str">"Hello, {}!"</span>, <span class="str">"world"</span>);         <span class="cm">// Hello, world!</span>
+std::print(<span class="str">"x={}, y={}\n"</span>, <span class="num">3</span>, <span class="num">4</span>);
+std::println(<span class="str">"{:&gt;10.2f}"</span>, <span class="num">3.14159</span>);        <span class="cm">//       3.14</span>
+std::println(<span class="str">"{:#010x}"</span>, <span class="num">255</span>);             <span class="cm">// 0x000000ff</span>
+std::println(<span class="str">"{:+}"</span>, <span class="num">42</span>);                  <span class="cm">// +42</span>
+std::println(stderr, <span class="str">"Error: {}"</span>, msg);   <span class="cm">// в stderr</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">std::flat_map / std::flat_set + std::mdspan</h3>
+<pre><code><span class="cm">// flat_map — отсортированный массив пар (лучше cache locality чем map)</span>
+std::flat_map&lt;std::string, <span class="kw">int</span>&gt; scores;
+scores[<span class="str">"Alice"</span>] = <span class="num">95</span>;
+<span class="kw">for</span> (<span class="kw">const auto</span>&amp; [name, score] : scores)
+    std::println(<span class="str">"{}: {}"</span>, name, score);
+
+<span class="cm">// mdspan — многомерный non-owning вид на непрерывную память</span>
+std::vector&lt;<span class="kw">double</span>&gt; data(<span class="num">6</span>);
+<span class="kw">auto</span> matrix = std::mdspan(data.data(), <span class="num">2</span>, <span class="num">3</span>);  <span class="cm">// 2×3 матрица</span>
+matrix[<span class="num">0</span>, <span class="num">0</span>] = <span class="num">1.0</span>;
+matrix[<span class="num">1</span>, <span class="num">2</span>] = <span class="num">6.0</span>;</code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">std::generator — coroutine-based range</h3>
+<pre><code>std::generator&lt;<span class="kw">int</span>&gt; fibonacci() {
+    <span class="kw">int</span> a = <span class="num">0</span>, b = <span class="num">1</span>;
+    <span class="kw">while</span> (<span class="kw">true</span>) {
+        <span class="kw">co_yield</span> a;
+        a = std::exchange(b, a + b);
+    }
+}
+<span class="kw">for</span> (<span class="kw">int</span> n : fibonacci() | std::views::take(<span class="num">8</span>))
+    std::print(<span class="str">"{} "</span>, n);  <span class="cm">// 0 1 1 2 3 5 8 13</span></code></pre>
+
+  <h3 style="margin:20px 0 12px;font-size:1.05rem;color:#b8bdd0">Ranges additions: zip, enumerate, chunk, slide, cartesian_product</h3>
+<pre><code>std::vector&lt;<span class="kw">int</span>&gt;    ids   = {<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>};
+std::vector&lt;std::string&gt; names = {<span class="str">"Alice"</span>, <span class="str">"Bob"</span>, <span class="str">"Carol"</span>};
+
+<span class="cm">// zip — параллельный обход</span>
+<span class="kw">for</span> (<span class="kw">auto</span> [id, name] : std::views::zip(ids, names))
+    std::println(<span class="str">"{}: {}"</span>, id, name);
+
+<span class="cm">// enumerate — индекс + значение</span>
+<span class="kw">for</span> (<span class="kw">auto</span> [i, v] : std::views::enumerate(names))
+    std::println(<span class="str">"[{}] {}"</span>, i, v);
+
+<span class="cm">// chunk — разбить на группы по N</span>
+<span class="kw">for</span> (<span class="kw">auto</span> chunk : std::views::chunk(ids, <span class="num">2</span>)) { <span class="cm">/* ... */</span> }
+
+<span class="cm">// ranges::to — материализация ленивого view в контейнер</span>
+<span class="kw">auto</span> evens = ids
+    | std::views::filter([](<span class="kw">int</span> x){ <span class="kw">return</span> x % <span class="num">2</span> == <span class="num">0</span>; })
+    | std::ranges::to&lt;std::vector&gt;();</code></pre>
+
+  <div class="feature-grid">
+    <div class="fi"><div class="fi-dot r"></div><div><code>import std;</code> — весь стандарт как единый модуль</div></div>
+    <div class="fi"><div class="fi-dot r"></div><div><code>std::stacktrace</code> — захват и вывод стека вызовов</div></div>
+    <div class="fi"><div class="fi-dot r"></div><div><code>std::move_only_function</code> — std::function для non-copyable callable</div></div>
+    <div class="fi"><div class="fi-dot r"></div><div><code>std::spanstream</code> — stream поверх фиксированного <code>char[]</code> буфера</div></div>
+    <div class="fi"><div class="fi-dot r"></div><div><code>std::byteswap(x)</code> — перестановка байт (endian swap)</div></div>
+    <div class="fi"><div class="fi-dot r"></div><div><code>std::to_underlying(e)</code> — enum → underlying integer type</div></div>
+    <div class="fi"><div class="fi-dot r"></div><div><code>std::unreachable()</code> — UB-hint оптимизатору: «этот код недостижим»</div></div>
+    <div class="fi"><div class="fi-dot r"></div><div><code>string::contains()</code> — проверка вхождения подстроки</div></div>
+    <div class="fi"><div class="fi-dot r"></div><div><code>std::views::slide</code> — скользящее окно по диапазону</div></div>
+    <div class="fi"><div class="fi-dot r"></div><div><code>std::views::cartesian_product</code> — декартово произведение диапазонов</div></div>
+    <div class="fi"><div class="fi-dot r"></div><div><code>&lt;stdfloat&gt;</code> — <code>float16_t</code>, <code>float32_t</code>, <code>float64_t</code>, <code>bfloat16_t</code></div></div>
+  </div>
+
+  <div class="table-wrap" style="margin-top:32px">
+    <table>
+      <tr><th>Стандарт</th><th>Ключевые возможности</th><th>Флаг</th></tr>
+      <tr><td><code>C++11</code></td><td>auto/decltype, lambda, move&&, constexpr, variadic, nullptr, override, enum class, smart_ptr, thread</td><td><code>-std=c++11</code></td></tr>
+      <tr><td><code>C++14</code></td><td>generic lambda, init-captures, relaxed constexpr, variable templates, make_unique</td><td><code>-std=c++14</code></td></tr>
+      <tr><td><code>C++17</code></td><td>structured bindings, if constexpr, fold expressions, CTAD, optional, variant, filesystem, par algorithms</td><td><code>-std=c++17</code></td></tr>
+      <tr><td><code>C++20</code></td><td>Concepts, Modules, Coroutines, Ranges, &lt;=&gt;, consteval, format, span, jthread</td><td><code>-std=c++20</code></td></tr>
+      <tr><td><code>C++23</code></td><td>expected, print, flat_map, mdspan, generator, deducing this, ranges++</td><td><code>-std=c++23</code></td></tr>
+    </table>
+  </div>
+
+  <div class="итог"><strong>C++23:</strong> deducing this, if consteval, std::expected, std::print, std::flat_map, std::mdspan, std::generator и богатые дополнения Ranges.</div>
+</section>
+
+</main>
+</div><!-- /page-standards -->
+
+<script src="main.js"></script>
 
 </body>
 </html>
